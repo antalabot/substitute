@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Substitute.Domain.Data
+﻿namespace Substitute.Domain.Data
 {
     public abstract class EntityBase : IEntity
     {

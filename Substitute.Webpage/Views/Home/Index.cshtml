@@ -2,16 +2,7 @@
     ViewData["Title"] = "Home Page";
 }
 
-@if (User?.Identity?.IsAuthenticated ?? false)
-{
-    <h1>Welcome, @User.Identity.Name</h1>
-
-    <p>
-        @foreach (var claim in Context.User.Claims)
-        {
-            <div>@claim.Type: <b>@claim.Value</b></div>
-        }
-    </p>
-
-    <a class="btn btn-lg btn-danger" href="/signout?returnUrl=%2F">Sign out</a>
-}
+<div class="jumbotron">
+    <h1>Welcome to Substitute Discord Bot!</h1>
+    <p>Please sign in to start using it.</p>
+</div>

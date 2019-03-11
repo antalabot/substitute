@@ -39,7 +39,7 @@ namespace Substitute.Domain.DataStore.Impl
         #endregion
 
         #region Interface implementation
-        public async new Task AddAsync<TEntity>(TEntity entity, CancellationToken cancellationToken = default(CancellationToken)) where TEntity : class, IEntity
+        public async new Task AddAsync<TEntity>(TEntity entity, CancellationToken cancellationToken = default) where TEntity : class, IEntity
         {
             await base.AddAsync(entity, cancellationToken);
         }
@@ -49,17 +49,17 @@ namespace Substitute.Domain.DataStore.Impl
             base.AddRange(entities);
         }
 
-        public async Task AddRangeAsync<TEntity>(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken)) where TEntity : class, IEntity
+        public async Task AddRangeAsync<TEntity>(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default) where TEntity : class, IEntity
         {
             await base.AddRangeAsync(entities, cancellationToken);
         }
 
-        public IEnumerable<TEntity> Get<TEntity>() where TEntity : class, IEntity
+        public IQueryable<TEntity> Get<TEntity>() where TEntity : class, IEntity
         {
             return base.Set<TEntity>();
         }
 
-        public async Task<IEnumerable<TEntity>> GetAsync<TEntity>(CancellationToken cancellationToken = default(CancellationToken)) where TEntity : class, IEntity
+        public async Task<IEnumerable<TEntity>> GetAsync<TEntity>(CancellationToken cancellationToken = default) where TEntity : class, IEntity
         {
             return await Task.FromResult(base.Set<TEntity>());
         }
@@ -69,12 +69,12 @@ namespace Substitute.Domain.DataStore.Impl
             return base.Set<TEntity>().SingleOrDefault(e => e.Id == id);
         }
 
-        public async Task<TEntity> GetByIdAsync<TEntity>(ulong id, CancellationToken cancellationToken = default(CancellationToken)) where TEntity : class, IEntity
+        public async Task<TEntity> GetByIdAsync<TEntity>(ulong id, CancellationToken cancellationToken = default) where TEntity : class, IEntity
         {
             return await base.Set<TEntity>().SingleOrDefaultAsync(e => e.Id == id, cancellationToken);
         }
 
-        public async Task RemoveAsync<TEntity>(TEntity entity, CancellationToken cancellationToken = default(CancellationToken)) where TEntity : class, IEntity
+        public async Task RemoveAsync<TEntity>(TEntity entity, CancellationToken cancellationToken = default) where TEntity : class, IEntity
         {
             await Task.FromResult(base.Remove(entity));
         }
@@ -84,7 +84,7 @@ namespace Substitute.Domain.DataStore.Impl
             base.Remove(GetById<TEntity>(id));
         }
 
-        public async Task RemoveByIdAsync<TEntity>(ulong id, CancellationToken cancellationToken = default(CancellationToken)) where TEntity : class, IEntity
+        public async Task RemoveByIdAsync<TEntity>(ulong id, CancellationToken cancellationToken = default) where TEntity : class, IEntity
         {
             base.Remove(await GetByIdAsync<TEntity>(id, cancellationToken));
         }
@@ -94,12 +94,12 @@ namespace Substitute.Domain.DataStore.Impl
             base.RemoveRange(entities);
         }
 
-        public async Task RemoveRangeAsync<TEntity>(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken)) where TEntity : class, IEntity
+        public async Task RemoveRangeAsync<TEntity>(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default) where TEntity : class, IEntity
         {
             await Task.Factory.StartNew(() => base.RemoveRange(entities), cancellationToken);
         }
 
-        public async Task UpdateAsync<TEntity>(TEntity entity, CancellationToken cancellationToken = default(CancellationToken)) where TEntity : class, IEntity
+        public async Task UpdateAsync<TEntity>(TEntity entity, CancellationToken cancellationToken = default) where TEntity : class, IEntity
         {
             await Task.Factory.StartNew(() => base.Update(entity), cancellationToken);
         }
@@ -109,7 +109,7 @@ namespace Substitute.Domain.DataStore.Impl
             base.UpdateRange(entities);
         }
 
-        public async Task UpdateRangeAsync<TEntity>(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default(CancellationToken)) where TEntity : class, IEntity
+        public async Task UpdateRangeAsync<TEntity>(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default) where TEntity : class, IEntity
         {
             await Task.Factory.StartNew(() => base.UpdateRange(entities), cancellationToken);
         }
@@ -127,6 +127,11 @@ namespace Substitute.Domain.DataStore.Impl
         void IContext.Update<TEntity>(TEntity entity)
         {
             base.Update(entity);
+        }
+
+        async Task<IQueryable<TEntity>> IContext.GetAsync<TEntity>(CancellationToken cancellationToken)
+        {
+            return await Task.FromResult(base.Set<TEntity>());
         }
         #endregion
     }

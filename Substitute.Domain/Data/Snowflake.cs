@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Substitute.Domain.Data
 {
-    public class Snowflake
+    public class Snowflake : ISnowflake
     {
         #region Private readonly variables
         private readonly ushort _machineId;
@@ -16,38 +14,14 @@ namespace Substitute.Domain.Data
         #endregion
 
         #region Constructor
-        private Snowflake()
+        Snowflake()
         {
             _machineId = 0;
             _sequenceLock = new object();
             _sequence = 0;
         }
         #endregion
-
-        #region Singleton implementation
-        private static Snowflake _instance;
-        private static readonly object _instanceLock = new object();
-
-        public static Snowflake Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    lock (_instanceLock)
-                    {
-                        if (_instance == null)
-                        {
-                            _instance = new Snowflake();
-                        }
-                    }
-                }
-
-                return _instance;
-            }
-        }
-        #endregion
-
+        
         #region Public methods
         public ulong GetSnowflake()
         {

@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Substitute.Business.Services;
+using Substitute.Business.Services.Impl;
 using Substitute.Domain;
+using Substitute.Domain.Data;
+using Substitute.Domain.DataStore;
 using Substitute.Domain.DataStore.Impl;
 
 namespace Substitute.Webpage
@@ -38,6 +37,13 @@ namespace Substitute.Webpage
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            services.AddDistributedMemoryCache();
+
+            services.AddSession(options =>
+            {
+                options.Cookie.HttpOnly = true;
+            });
+
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -45,7 +51,7 @@ namespace Substitute.Webpage
 
             .AddCookie(options =>
             {
-                options.LoginPath = "/login";
+                options.LoginPath = "/signin";
                 options.LogoutPath = "/signout";
             })
 
@@ -54,7 +60,24 @@ namespace Substitute.Webpage
                 options.ClientId = Settings.DiscordId;
                 options.ClientSecret = Settings.DiscordSecret;
                 options.Scope.Add("identify");
+                options.Scope.Add("guilds");
             });
+
+            services.AddMemoryCache();
+
+            #region Register services
+            #region Domain services
+            services.AddScoped<IContext, PgContext>();
+            services.AddSingleton<ICache, InMemoryCache>();
+            services.AddSingleton<IStorage, FileStorage>();
+            services.AddSingleton<ISnowflake, Snowflake>();
+            #endregion
+            #region Business services
+            services.AddSingleton<IDiscordBotRestService, DiscordBotRestService>();
+            services.AddScoped<IDiscordUserRestService, DiscordUserRestService>();
+            services.AddScoped<IImageResponseService, ImageResponseService>();
+            #endregion
+            #endregion
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
@@ -75,6 +98,7 @@ namespace Substitute.Webpage
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+            app.UseSession();
 
             app.UseAuthentication();
 
