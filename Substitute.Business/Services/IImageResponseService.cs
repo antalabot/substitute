@@ -6,7 +6,7 @@ namespace Substitute.Business.Services
 {
     public interface IImageResponseService
     {
-        IEnumerable<ImageResponseDigestModel> List(ImageResponseFilterModel filter);
+        Task<IEnumerable<ImageResponseDigestModel>> List(ImageResponseFilterModel filter);
         Task<ImageResponseModel> Details(ulong id, ulong userId, ulong? guildId = null);
         Task<ulong> Create(ImageResponseModel imageResponse, ulong userId);
         Task<ImageResponseModel> Update(ImageResponseModel imageResponse, ulong userId);

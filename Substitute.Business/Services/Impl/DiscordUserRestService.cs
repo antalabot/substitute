@@ -33,18 +33,18 @@ namespace Substitute.Business.Services.Impl
         #endregion
 
         #region Implementation of IDiscordUserRestService
-        public async Task<IEnumerable<UserGuild>> GetGuilds()
+        public async Task<IEnumerable<UserGuildModel>> GetGuilds()
         {
             return await _cache.GetOrCreateAsync($"{CLASS_NAME}|GetGuilds|{_token}", FetchGuilds);
         }
         #endregion
 
         #region Private helpers
-        private async Task<IEnumerable<UserGuild>> FetchGuilds(ICacheEntity entity)
+        private async Task<IEnumerable<UserGuildModel>> FetchGuilds(ICacheEntity entity)
         {
             entity.SlidingExpiration = _getGuildsExpiration;
             IEnumerable<RestUserGuild> list = await _discordClient.GetGuildSummariesAsync().FlattenAsync();
-            return list.Select(g => new UserGuild
+            return list.Select(g => new UserGuildModel
             {
                 CanManage = g.Permissions.ManageGuild,
                 IconUrl = g.IconUrl,

@@ -73,9 +73,13 @@ namespace Substitute.Webpage
             services.AddSingleton<ISnowflake, Snowflake>();
             #endregion
             #region Business services
+            services.AddScoped<IBotService, BotService>();
             services.AddSingleton<IDiscordBotRestService, DiscordBotRestService>();
             services.AddScoped<IDiscordUserRestService, DiscordUserRestService>();
+            services.AddScoped<IGuildService, GuildService>();
             services.AddScoped<IImageResponseService, ImageResponseService>();
+            services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IUserService, UserService>();
             #endregion
             #endregion
 

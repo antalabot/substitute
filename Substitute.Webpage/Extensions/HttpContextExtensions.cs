@@ -11,7 +11,7 @@ namespace Substitute.Webpage.Extensions
     public static class HttpContextExtensions
     {
         #region Private constants
-        private const string SERVER_ID = "ServerId";
+        private const string GUILD_ID = "GuildId";
         private const string USER_DATA = "UserData";
         #endregion
 
@@ -41,24 +41,12 @@ namespace Substitute.Webpage.Extensions
                     select scheme).Any();
         }
 
-        public static bool HasUserServer(this HttpContext context)
-        {
-            return context.Session.Keys.Contains(SERVER_ID);
-        }
+        public static bool HasUserGuildId(this HttpContext context) => context.Session.Keys.Contains(GUILD_ID);
 
-        public static ulong? GetUserServerOrNull(this HttpContext context)
-        {
-            return context.HasUserServer() ? context.Session.Get<ulong>(SERVER_ID) as ulong? : null;
-        }
+        public static ulong? GetUserGuildIdOrNull(this HttpContext context) => context.HasUserGuildId() ? context.Session.Get<ulong>(GUILD_ID) as ulong? : null;
 
-        public static bool HasUserData(this HttpContext context)
-        {
-            return context.Session.Keys.Contains(USER_DATA);
-        }
+        public static bool HasUserData(this HttpContext context) => context.Session.Keys.Contains(USER_DATA);
 
-        public static UserDataModel GetUserData(this HttpContext context)
-        {
-            return context.HasUserData() ? context.Session.Get<UserDataModel>(USER_DATA) as UserDataModel : null;
-        }
+        public static UserDataModel GetUserData(this HttpContext context) => context.HasUserData() ? context.Session.Get<UserDataModel>(USER_DATA) as UserDataModel : null;
     }
 }

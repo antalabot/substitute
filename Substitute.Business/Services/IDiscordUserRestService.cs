@@ -6,6 +6,6 @@ namespace Substitute.Business.Services
 {
     public interface IDiscordUserRestService
     {
-        Task<IEnumerable<UserGuild>> GetGuilds();
+        Task<IEnumerable<UserGuildModel>> GetGuilds();
     }
 }

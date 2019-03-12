@@ -37,7 +37,7 @@ namespace Substitute.Business.Services.Impl
         #endregion
 
         #region Public methods
-        public async Task<IEnumerable<Role>> GetGuildUserRoles(ulong guildId, ulong userId)
+        public async Task<IEnumerable<RoleModel>> GetGuildUserRoles(ulong guildId, ulong userId)
         {
             return await _cache.GetOrCreateAsync($"{CLASS_NAME}|GetGuildUserRoles|{guildId}|{userId}",
                                                  entity =>
@@ -47,7 +47,7 @@ namespace Substitute.Business.Services.Impl
                                                  });
         }
 
-        public async Task<IEnumerable<Role>> GetGuildRoles(ulong guildId)
+        public async Task<IEnumerable<RoleModel>> GetGuildRoles(ulong guildId)
         {
             return await _cache.GetOrCreateAsync($"{CLASS_NAME}|GetGuildRoles|{guildId}",
                                                  entity =>
@@ -63,18 +63,29 @@ namespace Substitute.Business.Services.Impl
                                                  async entity =>
                                                  {
                                                      entity.SlidingExpiration = _getGuildUserAccessLevelExpiration;
-                                                     IEnumerable<Role> roles = await GetGuildUserRoles(guildId, userId);
+                                                     IEnumerable<RoleModel> roles = await GetGuildUserRoles(guildId, userId);
                                                      return roles.Min(r => r.AccessLevel);
                                                  });
+        }
+
+        public async Task<IEnumerable<GuildModel>> GetGuilds()
+        {
+            return (await _discordClient.GetGuildsAsync()).Select(g => new GuildModel
+            {
+                IconUrl = g.IconUrl,
+                Id = g.Id,
+                Name = g.Name,
+                OwnerId = g.OwnerId
+            });
         }
         #endregion
 
         #region Private helpers
-        public async Task<IEnumerable<Role>> FetchGuildRoles(ulong guildId)
+        public async Task<IEnumerable<RoleModel>> FetchGuildRoles(ulong guildId)
         {
             var guild = await _discordClient.GetGuildAsync(guildId);
             var dbRoles = _context.Get<GuildRole>().Where(r => r.GuildId == guildId);
-            return guild.Roles.GroupJoin(dbRoles, k => k.Id, k => k.Id, (rest, db) => new Role
+            return guild.Roles.GroupJoin(dbRoles, k => k.Id, k => k.Id, (rest, db) => new RoleModel
             {
                 AccessLevel = db.SingleOrDefault()?.AccessLevel ?? EAccessLevel.User,
                 Id = rest.Id,
@@ -82,10 +93,10 @@ namespace Substitute.Business.Services.Impl
             });
         }
 
-        public async Task<IEnumerable<Role>> FetchGuildUserRoles(ulong guildId, ulong userId)
+        public async Task<IEnumerable<RoleModel>> FetchGuildUserRoles(ulong guildId, ulong userId)
         {
             RestGuildUser user = await _discordClient.GetGuildUserAsync(guildId, userId);
-            IEnumerable<Role> guildRoles = await GetGuildRoles(guildId);
+            IEnumerable<RoleModel> guildRoles = await GetGuildRoles(guildId);
             return guildRoles.Where(r => user.RoleIds.Contains(r.Id));
         }
         #endregion

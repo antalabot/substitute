@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Substitute.Business.DataStructs.Guild
 {
-    public class UserGuild
+    public class UserGuildModel
     {
         public ulong Id { get; set; }
         public string Name { get; set; }

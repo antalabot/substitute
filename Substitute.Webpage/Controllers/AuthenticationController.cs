@@ -50,7 +50,7 @@ namespace Substitute.Webpage.Controllers
                 return BadRequest();
             }
             
-            return Challenge(new AuthenticationProperties { RedirectUri = string.IsNullOrWhiteSpace(returnUrl) ? Url.Action("Choose", "Server") : returnUrl }, provider);
+            return Challenge(new AuthenticationProperties { RedirectUri = string.IsNullOrWhiteSpace(returnUrl) ? Url.Action("Choose", "Guild") : returnUrl }, provider);
         }
 
         [Authorize]

@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Substitute.Business.Services.Impl
 {
@@ -15,9 +16,9 @@ namespace Substitute.Business.Services.Impl
             _userService = userService;
         }
 
-        protected bool HasGuildAccessLevel(ulong userId, ulong guildId, EAccessLevel accessLevel)
+        protected async Task<bool> HasGuildAccessLevel(ulong userId, ulong guildId, EAccessLevel accessLevel)
         {
-            EAccessLevel userAccessLevel = _userService.GetGuildAccessLevel(userId, guildId);
+            EAccessLevel userAccessLevel = await _userService.GetGuildAccessLevel(userId, guildId);
             switch (accessLevel)
             {
                 case EAccessLevel.Administrator:

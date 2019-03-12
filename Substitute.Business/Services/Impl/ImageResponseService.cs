@@ -34,7 +34,7 @@ namespace Substitute.Business.Services.Impl
 
         public async Task<ulong> Create(ImageResponseModel imageResponse, ulong userId)
         {
-            CheckPrivilages(userId, imageResponse.GuildId.GetValueOrDefault(), EAccessLevel.Moderator);
+            await CheckPrivilages(userId, imageResponse.GuildId.GetValueOrDefault(), EAccessLevel.Moderator);
 
             bool exists = _context.Get<ImageResponse>().Any(r => r.Command == imageResponse.Command);
             if (exists)
@@ -75,8 +75,8 @@ namespace Substitute.Business.Services.Impl
             {
                 throw new CommandNotExistsException();
             }
-            
-            CheckPrivilages(userId, image.GuildId.GetValueOrDefault(), EAccessLevel.Moderator);
+
+            await CheckPrivilages(userId, image.GuildId.GetValueOrDefault(), EAccessLevel.Moderator);
 
             await _context.RemoveByIdAsync<ImageResponse>(id);
             _context.SaveChanges();
@@ -85,7 +85,7 @@ namespace Substitute.Business.Services.Impl
 
         public async Task<ImageResponseModel> Details(ulong id, ulong userId, ulong? guildId = null)
         {
-            CheckPrivilages(userId, guildId.GetValueOrDefault(), EAccessLevel.User);
+            await CheckPrivilages(userId, guildId.GetValueOrDefault(), EAccessLevel.User);
 
             ImageResponse image = await _context.GetByIdAsync<ImageResponse>(id);
             if (image == null)
@@ -104,15 +104,15 @@ namespace Substitute.Business.Services.Impl
                 throw new CommandNotExistsException();
             }
 
-            CheckPrivilages(userId, image.GuildId.GetValueOrDefault(), EAccessLevel.User);
+            await CheckPrivilages(userId, image.GuildId.GetValueOrDefault(), EAccessLevel.User);
 
             return await GetModel(image);
         }
 
-        public IEnumerable<ImageResponseDigestModel> List(ImageResponseFilterModel filter)
+        public async Task<IEnumerable<ImageResponseDigestModel>> List(ImageResponseFilterModel filter)
         {
             ulong guildId = filter.GuildId.GetValueOrDefault();
-            CheckPrivilages(filter.UserId, guildId, EAccessLevel.User);
+            await CheckPrivilages(filter.UserId, guildId, EAccessLevel.User);
 
             IQueryable<ImageResponse> images = _context.Get<ImageResponse>();
 
@@ -138,7 +138,7 @@ namespace Substitute.Business.Services.Impl
 
         public async Task<ImageResponseModel> Update(ImageResponseModel imageResponse, ulong userId)
         {
-            CheckPrivilages(userId, imageResponse.GuildId.GetValueOrDefault(), EAccessLevel.Moderator);
+            await CheckPrivilages(userId, imageResponse.GuildId.GetValueOrDefault(), EAccessLevel.Moderator);
 
             ImageResponse model = await _context.GetByIdAsync<ImageResponse>(imageResponse.Id);
             if (model == null)
@@ -177,9 +177,9 @@ namespace Substitute.Business.Services.Impl
         }
 
         #region Private helpers
-        private void CheckPrivilages(ulong userId, ulong guildId, EAccessLevel accessLevel)
+        private async Task CheckPrivilages(ulong userId, ulong guildId, EAccessLevel accessLevel)
         {
-            if (!HasGuildAccessLevel(userId, guildId, EAccessLevel.Moderator))
+            if (!await HasGuildAccessLevel(userId, guildId, EAccessLevel.Moderator))
             {
                 throw new UnauthorizedAccessException();
             }

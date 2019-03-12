@@ -13,8 +13,4 @@
     <ProjectReference Include="..\Substitute.Domain\Substitute.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DataStructs\User\" />
-  </ItemGroup>
-
 </Project>

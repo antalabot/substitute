@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Substitute.Business;
 using Substitute.Business.Services;
-using Substitute.Webpage.Extensions;
 using Substitute.Webpage.Models;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -11,12 +9,9 @@ namespace Substitute.Webpage.Controllers
 {
     public class HomeController : ControllerBase
     {
-        private readonly IDiscordBotRestService _discordBotRestService;
-
-        public HomeController(IDiscordBotRestService discordBotRestService, IUserService userService)
+        public HomeController(IUserService userService)
             : base(userService)
         {
-            _discordBotRestService = discordBotRestService;
         }
 
         public IActionResult Index()
@@ -29,9 +24,24 @@ namespace Substitute.Webpage.Controllers
         }
 
         [Authorize]
-        public IActionResult Setup()
+        public async Task<IActionResult> Setup()
         {
+            if (await _userService.IsOwnerSet())
+            {
+                return RedirectToAction("Index", "Home");
+            }
             return View();
+        }
+
+        [Authorize]
+        public async Task<IActionResult> ClaimOwnership()
+        {
+            if (await _userService.IsOwnerSet())
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            await _userService.SetOwner(GetUserData().Id);
+            return RedirectToAction("Index", "Home");
         }
         
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

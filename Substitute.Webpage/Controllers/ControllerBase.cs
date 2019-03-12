@@ -12,14 +12,10 @@ namespace Substitute.Webpage.Controllers
     public abstract class ControllerBase : Controller
     {
         #region Private constants
-        private const string SERVER_ID = "ServerId";
+        private const string GUILD_ID = "GuildId";
         private const string USER_DATA = "UserData";
         #endregion
-
-        #region Private readonly variables
-        private readonly object _userDataLock;
-        #endregion
-
+        
         #region Protected readonly variables
         protected readonly IUserService _userService;
         #endregion
@@ -28,30 +24,35 @@ namespace Substitute.Webpage.Controllers
         public ControllerBase(IUserService userService)
         {
             _userService = userService;
-            _userDataLock = new object();
         }
         #endregion
 
         #region Protected helpers
-        protected void SetUserServer(ulong serverId)
-        {
-            HttpContext.Session.Set(SERVER_ID, serverId);
-        }
+        protected void SetUserGuildId(ulong serverId) => HttpContext.Session.Set(GUILD_ID, serverId);
 
-        protected void SetUserData(UserDataModel model)
+        protected void SetUserData(UserDataModel model) => HttpContext.Session.Set(USER_DATA, model);
+
+        protected async Task<UserDataModel> GetUserData()
         {
-            HttpContext.Session.Set(USER_DATA, model);
+            if (!HasUserData)
+            {
+                if (!HasUserData)
+                {
+                    SetUserData(await _userService.GetUserData(User?.GetUserToken().ToString()));
+                }
+            }
+            return HttpContext.GetUserData();
         }
 
         protected ActionResult RedirectAuthenticated()
         {
-            if (HasUserServer)
+            if (HasUserGuildId)
             {
-                return RedirectToAction("Index", "Server");
+                return RedirectToAction("Index", "Home");
             }
             else
             {
-                return RedirectToAction("Choose", "Server");
+                return RedirectToAction("Choose", "Guild");
             }
         }
 
@@ -107,55 +108,13 @@ namespace Substitute.Webpage.Controllers
         #endregion
 
         #region Protected properties
-        protected bool HasUserData
-        {
-            get
-            {
-                return HttpContext.HasUserData();
-            }
-        }
+        protected bool HasUserData => HttpContext.HasUserData();
+        
+        protected bool HasUserGuildId => HttpContext.HasUserGuildId();
 
-        protected UserDataModel UserData
-        {
-            get
-            {
-                if (!HasUserData)
-                {
-                    lock (_userDataLock)
-                    {
-                        if (!HasUserData)
-                        {
-                            SetUserData(_userService.GetUserData(User?.GetUserToken().ToString()));
-                        }
-                    }
-                }
-                return HttpContext.GetUserData();
-            }
-        }
+        protected ulong? UserGuildId => HttpContext.GetUserGuildIdOrNull();
 
-        protected bool HasUserServer
-        {
-            get
-            {
-                return HttpContext.HasUserServer();
-            }
-        }
-
-        protected ulong? UserServer
-        {
-            get
-            {
-                return HttpContext.GetUserServerOrNull();
-            }
-        }
-
-        protected bool IsUserAuthenticated
-        {
-            get
-            {
-                return User?.Identity?.IsAuthenticated ?? false;
-            }
-        }
+        protected bool IsUserAuthenticated => User?.Identity?.IsAuthenticated ?? false;
         #endregion
     }
 }

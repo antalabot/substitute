@@ -15,52 +15,37 @@ namespace Substitute.Webpage.Controllers
 
         #region Constructor
         public ImageResponseController(IImageResponseService imageResponseService, IUserService userService)
-            : base(userService)
-        {
-            _imageResponseService = imageResponseService;
-        }
+            : base(userService) => _imageResponseService = imageResponseService;
         #endregion
 
         #region Views
         [HttpGet]
-        public IActionResult Index()
-        {
-            return View();
-        }
+        public IActionResult Index() => View();
         #endregion
 
         #region POST methods
         [HttpPost]
-        public JsonResult List(ImageResponseFilterModel filter)
-        {
-            return GetResult(() => _imageResponseService.List(filter));
-        }
+        public async Task<JsonResult> List(ImageResponseFilterModel filter) => await GetResultAsync(async () => await _imageResponseService.List(filter));
 
         [HttpPost]
         public async Task<JsonResult> Create(ImageResponseModel model)
         {
-            model.GuildId = UserServer;
-            return await GetResultAsync(() => _imageResponseService.Create(model, UserData.Id));
+            model.GuildId = UserGuildId;
+            return await GetResultAsync(async () => _imageResponseService.Create(model, (await GetUserData()).Id));
         }
 
         [HttpPost]
-        public async Task<JsonResult> Details(ulong id)
-        {
-            return await GetResultAsync(() => _imageResponseService.Details(id, UserData.Id, UserServer));
-        }
+        public async Task<JsonResult> Details(ulong id) => await GetResultAsync(async () => _imageResponseService.Details(id, (await GetUserData()).Id, UserGuildId));
 
         [HttpPost]
         public async Task<JsonResult> Update(ImageResponseModel model)
         {
-            model.GuildId = UserServer;
-            return await GetResultAsync(() => _imageResponseService.Update(model, UserData.Id));
+            model.GuildId = UserGuildId;
+            return await GetResultAsync(async () => _imageResponseService.Update(model, (await GetUserData()).Id));
         }
 
         [HttpPost]
-        public async Task<JsonResult> Delete(ulong id)
-        {
-            return await GetResultAsync(() => _imageResponseService.Delete(id, UserData.Id));
-        }
+        public async Task<JsonResult> Delete(ulong id) => await GetResultAsync(async () => _imageResponseService.Delete(id, (await GetUserData()).Id));
         #endregion
     }
 }

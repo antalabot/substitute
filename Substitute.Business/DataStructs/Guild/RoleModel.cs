@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Substitute.Business.DataStructs.Guild
 {
-    public class Role
+    public class RoleModel
     {
-        public Role()
+        public RoleModel()
         {
             AccessLevel = EAccessLevel.User;
         }
