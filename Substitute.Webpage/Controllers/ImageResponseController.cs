@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Substitute.Business.DataStructs.ImageResponse;
 using Substitute.Business.Services;
+using Substitute.Domain.Enums;
 using System.Threading.Tasks;
+using System.Web.Http;
 
 namespace Substitute.Webpage.Controllers
 {
@@ -20,32 +22,32 @@ namespace Substitute.Webpage.Controllers
 
         #region Views
         [HttpGet]
-        public IActionResult Index() => View();
+        public async Task<IActionResult> Index() => await CheckPrivilages(EAccessLevel.User) ?? View();
         #endregion
 
         #region POST methods
         [HttpPost]
-        public async Task<JsonResult> List(ImageResponseFilterModel filter) => await GetResultAsync(async () => await _imageResponseService.List(filter));
+        public async Task<IActionResult> List(ImageResponseFilterModel filter) => await CheckPrivilages(EAccessLevel.User) ?? GetResult(() => _imageResponseService.List(filter));
 
         [HttpPost]
-        public async Task<JsonResult> Create(ImageResponseModel model)
+        public async Task<IActionResult> Create(ImageResponseModel model)
         {
             model.GuildId = UserGuildId;
-            return await GetResultAsync(async () => _imageResponseService.Create(model, (await GetUserData()).Id));
+            return await CheckPrivilages(EAccessLevel.Moderator) ?? await GetResultAsync(async () => await _imageResponseService.Create(model));
         }
 
         [HttpPost]
-        public async Task<JsonResult> Details(ulong id) => await GetResultAsync(async () => _imageResponseService.Details(id, (await GetUserData()).Id, UserGuildId));
+        public async Task<IActionResult> Details(ulong id) => await CheckPrivilages(EAccessLevel.User) ?? await GetResultAsync(async () => await _imageResponseService.Details(id));
 
         [HttpPost]
-        public async Task<JsonResult> Update(ImageResponseModel model)
+        public async Task<IActionResult> Update(ImageResponseModel model)
         {
             model.GuildId = UserGuildId;
-            return await GetResultAsync(async () => _imageResponseService.Update(model, (await GetUserData()).Id));
+            return await CheckPrivilages(EAccessLevel.Moderator) ?? await GetResultAsync(async () => await _imageResponseService.Update(model));
         }
 
         [HttpPost]
-        public async Task<JsonResult> Delete(ulong id) => await GetResultAsync(async () => _imageResponseService.Delete(id, (await GetUserData()).Id));
+        public async Task<IActionResult> Delete(ulong id) => await CheckPrivilages(EAccessLevel.Moderator) ?? await GetResultAsync(async () => await _imageResponseService.Delete(id));
         #endregion
     }
 }

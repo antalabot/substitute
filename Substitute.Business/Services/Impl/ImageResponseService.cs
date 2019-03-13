@@ -12,7 +12,7 @@ using Substitute.Domain.Enums;
 
 namespace Substitute.Business.Services.Impl
 {
-    public class ImageResponseService : ServiceBase, IImageResponseService
+    public class ImageResponseService : IImageResponseService
     {
         #region Private readonly variables
         private readonly ICache _cache;
@@ -22,8 +22,7 @@ namespace Substitute.Business.Services.Impl
         #endregion
 
         #region Constructor
-        public ImageResponseService(IContext context, ICache cache, IStorage storage, ISnowflake snowflake, IUserService userService)
-            : base(userService)
+        public ImageResponseService(IContext context, ICache cache, IStorage storage, ISnowflake snowflake)
         {
             _context = context;
             _cache = cache;
@@ -32,10 +31,8 @@ namespace Substitute.Business.Services.Impl
         }
         #endregion
 
-        public async Task<ulong> Create(ImageResponseModel imageResponse, ulong userId)
+        public async Task<ulong> Create(ImageResponseModel imageResponse)
         {
-            await CheckPrivilages(userId, imageResponse.GuildId.GetValueOrDefault(), EAccessLevel.Moderator);
-
             bool exists = _context.Get<ImageResponse>().Any(r => r.Command == imageResponse.Command);
             if (exists)
             {
@@ -68,25 +65,21 @@ namespace Substitute.Business.Services.Impl
             return model.Id;
         }
 
-        public async Task Delete(ulong id, ulong userId)
+        public async Task Delete(ulong id)
         {
             ImageResponse image = await _context.GetByIdAsync<ImageResponse>(id);
             if (image == null)
             {
                 throw new CommandNotExistsException();
             }
-
-            await CheckPrivilages(userId, image.GuildId.GetValueOrDefault(), EAccessLevel.Moderator);
 
             await _context.RemoveByIdAsync<ImageResponse>(id);
             _context.SaveChanges();
             _storage.Delete(EStorage.ImageResponse, image.Fielename, image.GuildId.ToString());
         }
 
-        public async Task<ImageResponseModel> Details(ulong id, ulong userId, ulong? guildId = null)
+        public async Task<ImageResponseModel> Details(ulong id)
         {
-            await CheckPrivilages(userId, guildId.GetValueOrDefault(), EAccessLevel.User);
-
             ImageResponse image = await _context.GetByIdAsync<ImageResponse>(id);
             if (image == null)
             {
@@ -96,23 +89,20 @@ namespace Substitute.Business.Services.Impl
             return await GetModel(image);
         }
 
-        public async Task<ImageResponseModel> GetImageByCommand(string command, ulong guildId, ulong userId)
+        public async Task<ImageResponseModel> GetImageByCommand(string command, ulong guildId)
         {
             ImageResponse image = _context.Get<ImageResponse>().SingleOrDefault(r => r.Command == command && r.GuildId == guildId);
             if (image == null)
             {
                 throw new CommandNotExistsException();
             }
-
-            await CheckPrivilages(userId, image.GuildId.GetValueOrDefault(), EAccessLevel.User);
-
+            
             return await GetModel(image);
         }
 
-        public async Task<IEnumerable<ImageResponseDigestModel>> List(ImageResponseFilterModel filter)
+        public IEnumerable<ImageResponseDigestModel> List(ImageResponseFilterModel filter)
         {
             ulong guildId = filter.GuildId.GetValueOrDefault();
-            await CheckPrivilages(filter.UserId, guildId, EAccessLevel.User);
 
             IQueryable<ImageResponse> images = _context.Get<ImageResponse>();
 
@@ -136,10 +126,8 @@ namespace Substitute.Business.Services.Impl
                          }).ToArray();
         }
 
-        public async Task<ImageResponseModel> Update(ImageResponseModel imageResponse, ulong userId)
+        public async Task<ImageResponseModel> Update(ImageResponseModel imageResponse)
         {
-            await CheckPrivilages(userId, imageResponse.GuildId.GetValueOrDefault(), EAccessLevel.Moderator);
-
             ImageResponse model = await _context.GetByIdAsync<ImageResponse>(imageResponse.Id);
             if (model == null)
             {
@@ -177,14 +165,6 @@ namespace Substitute.Business.Services.Impl
         }
 
         #region Private helpers
-        private async Task CheckPrivilages(ulong userId, ulong guildId, EAccessLevel accessLevel)
-        {
-            if (!await HasGuildAccessLevel(userId, guildId, EAccessLevel.Moderator))
-            {
-                throw new UnauthorizedAccessException();
-            }
-        }
-
         private async Task<ImageResponseModel> GetModel(ImageResponse image)
         {
             return new ImageResponseModel

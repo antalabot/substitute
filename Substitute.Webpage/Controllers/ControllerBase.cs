@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Substitute.Business.DataStructs.User;
 using Substitute.Business.Services;
+using Substitute.Domain.Enums;
 using Substitute.Webpage.Extensions;
 using Substitute.Webpage.Models;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Substitute.Webpage.Controllers
@@ -44,6 +46,11 @@ namespace Substitute.Webpage.Controllers
             return HttpContext.GetUserData();
         }
 
+        protected ActionResult RedirectToGuildSelect()
+        {
+            return RedirectToAction("Choose", "Guild");
+        }
+
         protected ActionResult RedirectAuthenticated()
         {
             if (HasUserGuildId)
@@ -52,7 +59,7 @@ namespace Substitute.Webpage.Controllers
             }
             else
             {
-                return RedirectToAction("Choose", "Guild");
+                return RedirectToGuildSelect();
             }
         }
 
@@ -103,6 +110,69 @@ namespace Substitute.Webpage.Controllers
             catch (Exception ex)
             {
                 return Json(JsonResponse.FromException(ex));
+            }
+        }
+
+        protected async Task CheckRole(ERole role)
+        {
+            ERole userRole = (await GetUserData()).Role;
+            switch (role)
+            {
+                case ERole.Owner:
+                    if (!new ERole[] { ERole.Owner }.Contains(userRole))
+                    {
+                        throw new UnauthorizedAccessException();
+                    }
+                    break;
+                case ERole.User:
+                    if (!new ERole[] { ERole.Owner, ERole.User }.Contains(userRole))
+                    {
+                        throw new UnauthorizedAccessException();
+                    }
+                    break;
+            }
+        }
+
+        protected async Task<IActionResult> CheckPrivilages(EAccessLevel accessLevel)
+        {
+            if (!IsUserAuthenticated)
+            {
+                return Redirect("/signin");
+            }
+
+            var userData = await GetUserData();
+            if (userData == null)
+            {
+                return BadRequest();
+            }
+
+            if (!HasUserGuildId)
+            {
+                return RedirectToGuildSelect();
+            }
+
+            if (!await HasGuildAccessLevel(userData.Id, UserGuildId.GetValueOrDefault(), EAccessLevel.Moderator))
+            {
+                return Unauthorized();
+            }
+            return null;
+        }
+
+        protected async Task<bool> HasGuildAccessLevel(ulong userId, ulong guildId, EAccessLevel accessLevel)
+        {
+            EAccessLevel userAccessLevel = await _userService.GetGuildAccessLevel(userId, guildId);
+            switch (accessLevel)
+            {
+                case EAccessLevel.Administrator:
+                    return new EAccessLevel[] { EAccessLevel.Administrator, EAccessLevel.Owner }.Contains(userAccessLevel);
+                case EAccessLevel.Moderator:
+                    return new EAccessLevel[] { EAccessLevel.Moderator, EAccessLevel.Administrator, EAccessLevel.Owner }.Contains(userAccessLevel);
+                case EAccessLevel.Owner:
+                    return new EAccessLevel[] { EAccessLevel.Owner }.Contains(userAccessLevel);
+                case EAccessLevel.User:
+                    return new EAccessLevel[] { EAccessLevel.User, EAccessLevel.Moderator, EAccessLevel.Administrator, EAccessLevel.Owner }.Contains(userAccessLevel);
+                default:
+                    return false;
             }
         }
         #endregion
