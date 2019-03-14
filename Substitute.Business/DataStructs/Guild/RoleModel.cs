@@ -13,6 +13,7 @@ namespace Substitute.Business.DataStructs.Guild
         }
 
         public ulong Id { get; set; }
+        public ulong GuildId { get; set; }
         public string Name { get; set; }
         public EAccessLevel AccessLevel { get; set; }
     }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Substitute.Business.DataStructs.Guild;
 using Substitute.Business.DataStructs.Role;
 using Substitute.Business.Services;
 using Substitute.Domain.Enums;
@@ -31,9 +32,10 @@ namespace Substitute.Webpage.Controllers
             return await CheckPrivilages(EAccessLevel.Owner) ?? await GetResultAsync(async() => await _guildService.GetRoles(model));
         }
 
-        public async Task<IActionResult> SetAccessLevel(ulong roleId, EAccessLevel accessLevel)
+        public async Task<IActionResult> SetAccessLevel(RoleModel model)
         {
-            return await CheckPrivilages(EAccessLevel.Owner) ?? await GetResultAsync(async () => await _guildService.SetRoleAccessLevel(UserGuildId.GetValueOrDefault(), roleId, accessLevel));
+            model.GuildId = UserGuildId.GetValueOrDefault();
+            return await CheckPrivilages(EAccessLevel.Owner) ?? await GetResultAsync(async () => await _guildService.SetRoleAccessLevel(model));
         }
     }
 }

@@ -10,6 +10,5 @@ namespace Substitute.Business.Services
         Task<IEnumerable<GuildModel>> GetGuilds();
         Task<IEnumerable<RoleModel>> GetGuildUserRoles(ulong guildId, ulong userId);
         Task<IEnumerable<RoleModel>> GetGuildRoles(ulong guildId);
-        Task<EAccessLevel> GetGuildUserAccessLevel(ulong guildId, ulong userId);
     }
 }

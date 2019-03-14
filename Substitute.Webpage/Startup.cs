@@ -74,12 +74,10 @@ namespace Substitute.Webpage
             #endregion
             #region Business services
             services.AddScoped<IBotService, BotService>();
-            services.AddSingleton<IDiscordBotRestService, DiscordBotRestService>();
-            services.AddScoped<IDiscordUserRestService, DiscordUserRestService>();
             services.AddScoped<IGuildService, GuildService>();
             services.AddScoped<IImageResponseService, ImageResponseService>();
-            services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddSingleton<IDiscordBotRestService, DiscordBotRestService>();
             #endregion
             #endregion
 

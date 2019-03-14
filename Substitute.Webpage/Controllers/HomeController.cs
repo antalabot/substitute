@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Substitute.Business.Services;
+using Substitute.Webpage.Extensions;
 using Substitute.Webpage.Models;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -40,7 +41,7 @@ namespace Substitute.Webpage.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
-            await _userService.SetOwner(GetUserData().Id);
+            await _userService.SetOwner((await GetUserData()).Id, User?.GetUserToken().ToString());
             return RedirectToAction("Index", "Home");
         }
         

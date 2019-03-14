@@ -10,8 +10,8 @@ namespace Substitute.Business.Services
     {
         Task<EAccessLevel> GetGuildAccessLevel(ulong userId, ulong guildId);
         Task<UserDataModel> GetUserData(string token);
-        Task<IEnumerable<GuildModel>> GetGuilds(string token);
+        Task<IEnumerable<UserGuildModel>> GetGuilds(string token);
         Task<bool> IsOwnerSet();
-        Task SetOwner(int userId);
+        Task SetOwner(ulong userId, string token);
     }
 }

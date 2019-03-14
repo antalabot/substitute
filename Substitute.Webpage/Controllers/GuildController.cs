@@ -35,7 +35,7 @@ namespace Substitute.Webpage.Controllers
         [HttpGet]
         public async Task<IActionResult> Choose(ulong guildId)
         {
-            if (!(await _userService.GetGuilds(User?.GetUserToken().ToString())).Any(g => g.Id == guildId))
+            if (!(await _userService.GetGuilds(User?.GetUserToken().ToString())).Any(g => g.Id == guildId && (g.CanManage || g.IsOwner)))
             {
                 throw new UnauthorizedAccessException();
             }
