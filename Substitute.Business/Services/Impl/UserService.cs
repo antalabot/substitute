@@ -50,7 +50,9 @@ namespace Substitute.Business.Services.Impl
                 using (IDiscordUserRestService userService = new DiscordUserRestService(token))
                 {
                     entity.SlidingExpiration = _getGuildsExpiration;
-                    return await userService.GetGuilds();
+                    IEnumerable<UserGuildModel> userGuilds = await userService.GetGuilds();
+                    IEnumerable<GuildModel> botGuilds = await _botService.GetGuilds();
+                    return userGuilds.Where(g => g.IsOwner || g.CanManage || botGuilds.Any(b => b.Id == g.Id));
                 }
             });
         }

@@ -75,10 +75,12 @@ namespace Substitute.Domain.DataStore.Impl
 
         public TItem Set<TItem>(string key, TItem value, ICacheEntityOptions options)
         {
-            MemoryCacheEntryOptions opts = new MemoryCacheEntryOptions();
-            opts.AbsoluteExpiration = options.AbsoluteExpiration;
-            opts.AbsoluteExpirationRelativeToNow = options.AbsoluteExpirationRelativeToNow;
-            opts.SlidingExpiration = options.SlidingExpiration;
+            MemoryCacheEntryOptions opts = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpiration = options.AbsoluteExpiration,
+                AbsoluteExpirationRelativeToNow = options.AbsoluteExpirationRelativeToNow,
+                SlidingExpiration = options.SlidingExpiration
+            };
             return _cache.Set(key, value, opts);
         }
 
