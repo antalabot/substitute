@@ -1,0 +1,17 @@
+﻿@model IEnumerable<Substitute.Business.DataStructs.Guild.GuildModel>
+
+@{
+    ViewData["Title"] = "Choose";
+}
+
+<h2>Choose server</h2>
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <a class="col-md-1 col-lg-1 col-sm-4 col-xs-6" href="@Url.Action("Choose", new { guildId = item.Id })">
+            <img src="@item.IconUrl" alt="" />
+            <p>@item.Name</p>
+        </a>
+    }
+</div>
