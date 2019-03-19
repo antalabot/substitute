@@ -3,7 +3,7 @@ using Substitute.Domain.Enums;
 
 namespace Substitute.Business.DataStructs.Role
 {
-    public class RoleFilterModel : FilterBase
+    public class RoleFilterModel : FilterBase, IRoleFilter
     {
         public ulong GuildId { get; set; }
         public string Name { get; set; }

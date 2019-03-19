@@ -11,8 +11,8 @@ namespace Substitute.Business.DataStructs
             SortDirection = ESortDirection.Ascending;
         }
 
-        public ushort Page { get; set; }
-        public ushort PerPage { get; set; }
+        public int Page { get; set; }
+        public int PerPage { get; set; }
         public ESortDirection SortDirection { get; set; }
     }
 }

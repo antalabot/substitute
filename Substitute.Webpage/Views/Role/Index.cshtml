@@ -1,32 +1,105 @@
-﻿
+﻿@model Substitute.Business.DataStructs.Role.RoleResultsModel
+@using Substitute.Webpage.Extensions
 @{
     ViewData["Title"] = "Index";
 }
 
 <h2>Index</h2>
 
-<table>
+@using (Html.BeginForm("Index", "Role", FormMethod.Get))
+{
+    <div class="input-group">
+        <span class="input-group-addon" id="basic-addon1">Name:</span>
+        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Name", ariaDescribedby = "basic-addon1" })
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon" id="basic-addon1">Access level:</span>
+        @Html.DropDownListFor(m => m.AccessLevel, Model.AccessLevels.ToOptionalSelectList(), new { @class = "form-control" })
+    </div>
+    <button type="button" class="btn btn-default"><i class="fas fa-search"></i></button>
+}
+
+<table class="table">
     <thead>
         <tr>
-            <th>Name</th>
-            <th>Access level</th>
+            <th>
+                Name
+            </th>
+            <th>
+                Access level
+            </th>
             <th></th>
         </tr>
     </thead>
-    <tbody data-bind="foreach: Roles">
-        <tr>
-            <td data-bind="text: name"></td>
-            <td>
-                <select data-bind="options: accessLevels,
-                       optionsText: 'name',
-                       optionsValue: 'value',
-                       value: accessLevel"></select>
-            </td>
-            <td>
-                <button data-bind="click: update, enable: hasChanged"><i class="fas fa-save"></i></button>
-                <button data-bind="click: reset, enable: hasChanged"><i class="fas fa-eraser"></i></button>
-            </td>
-        </tr>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AccessLevel)
+                </td>
+                <td>
+                    @using (Html.BeginForm("SetAccessLevel", "Role", FormMethod.Post))
+                    {
+                        @Html.DropDownListFor(modelItem => item.AccessLevel, Model.AccessLevels.ToSelectList())
+                        @Html.HiddenFor(modelItem => item.Id)
+                        <button type="button" class="btn btn-default"><i class="fas fa-save"></i></button>
+                    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 
+<nav aria-label="Pagination">
+    <ul class="pagination">
+        @if (Model.Page == 1)
+        {
+            <li class="disabled">
+                <span>
+                    <span aria-hidden="true">&laquo;</span>
+                </span>
+            </li>
+        }
+        else
+        {
+            <li>
+                <a href="@Url.Action("Index", "Role", Model.ChangePage(Model.Page - 1))" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+        }
+        @for (int i = 1; i < Model.Pages; i++)
+        {
+            if (i == Model.Page)
+            {
+                <li class="active">
+                    <span>@i <span class="sr-only">(current)</span></span>
+                </li>
+            }
+            else
+            {
+                <li><a href="@Url.Action("Index", "Role", Model.ChangePage(i))">@i</a></li>
+            }
+        }
+        @if (Model.Page == Model.Pages)
+        {
+            <li class="disabled">
+                <span>
+                    <span aria-hidden="true">&raquo;</span>
+                </span>
+            </li>
+        }
+        else
+        {
+            <li>
+                <a href="@Url.Action("Index", "Role", Model.ChangePage(Model.Page + 1))" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        }
+    </ul>
+</nav>
