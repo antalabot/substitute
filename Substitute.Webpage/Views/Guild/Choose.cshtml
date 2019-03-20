@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Substitute.Business.DataStructs.Guild.GuildModel>
+﻿@model IEnumerable<Substitute.Business.DataStructs.Guild.UserGuildModel>
 
 @{
     ViewData["Title"] = "Choose";
@@ -9,9 +9,13 @@
 <div class="row">
     @foreach (var item in Model)
     {
-        <a class="col-md-1 col-lg-1 col-sm-4 col-xs-6" href="@Url.Action("Choose", new { guildId = item.Id })">
-            <img src="@item.IconUrl" alt="" />
-            <p>@item.Name</p>
-        </a>
+        <div class="col-md-4 col-lg-3 col-sm-6 col-xs-12 text-center">
+            <a class="thumbnail" href="@Url.Action("Choose", new { guildId = item.Id })">
+                <img src="@item.IconUrl" alt="" />
+                <div class="caption">
+                    <p>@item.Name</p>
+                </div>
+            </a>
+        </div>
     }
 </div>

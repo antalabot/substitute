@@ -40,7 +40,7 @@ namespace Substitute.Webpage.Controllers
             {
                 if (!HasUserData)
                 {
-                    SetUserData(await _userService.GetUserData(User?.GetUserToken().ToString()));
+                    SetUserData(await _userService.GetUserData(await HttpContext.GetUserToken()));
                 }
             }
             return HttpContext.GetUserData();
@@ -139,9 +139,8 @@ namespace Substitute.Webpage.Controllers
             {
                 return Redirect("/signin");
             }
-
-            var userData = await GetUserData();
-            if (userData == null)
+            
+            if (User == null)
             {
                 return BadRequest();
             }
@@ -151,7 +150,7 @@ namespace Substitute.Webpage.Controllers
                 return RedirectToGuildSelect();
             }
 
-            if (!await HasGuildAccessLevel(userData.Id, UserGuildId.GetValueOrDefault(), EAccessLevel.Moderator))
+            if (!await HasGuildAccessLevel(User.GetUserId(), UserGuildId.GetValueOrDefault(), EAccessLevel.Moderator))
             {
                 return Unauthorized();
             }

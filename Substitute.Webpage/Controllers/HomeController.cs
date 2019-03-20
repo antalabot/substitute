@@ -41,7 +41,7 @@ namespace Substitute.Webpage.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
-            await _userService.SetOwner((await GetUserData()).Id, User?.GetUserToken().ToString());
+            await _userService.SetOwner(User.GetUserId(), await HttpContext.GetUserToken());
             return RedirectToAction("Index", "Home");
         }
         

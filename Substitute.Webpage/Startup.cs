@@ -59,6 +59,7 @@ namespace Substitute.Webpage
             {
                 options.ClientId = Settings.DiscordId;
                 options.ClientSecret = Settings.DiscordSecret;
+                options.SaveTokens = true;
                 options.Scope.Add("identify");
                 options.Scope.Add("guilds");
             });

@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Substitute.Business.Services;
 using Substitute.Webpage.Extensions;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Substitute.Webpage.Controllers
 {
@@ -29,20 +27,20 @@ namespace Substitute.Webpage.Controllers
         [HttpGet]
         public async Task<IActionResult> Choose()
         {
-            return View(await _userService.GetGuilds(User?.GetUserToken().ToString()));
+            return View(await _userService.GetGuilds(await HttpContext.GetUserToken()));
         }
 
         [HttpGet]
-        public async Task<IActionResult> Choose(ulong guildId)
+        public async Task<IActionResult> Select(ulong guildId)
         {
-            if (!(await _userService.GetGuilds(User?.GetUserToken().ToString())).Any(g => g.Id == guildId && (g.CanManage || g.IsOwner)))
+            if (!(await _userService.GetGuilds(await HttpContext.GetUserToken())).Any(g => g.Id == guildId && (g.CanManage || g.IsOwner)))
             {
-                throw new UnauthorizedAccessException();
+                return Unauthorized();
             }
 
             if (!await _botService.HasJoined(guildId))
             {
-                return Redirect(_botService.GetJoinLink(guildId, Url.Action("Choose", "Guild", new { guildId })));
+                return Redirect(_botService.GetJoinLink(guildId, Url.Action("Select", "Guild", new { guildId })));
             }
 
             SetUserGuildId(guildId);
