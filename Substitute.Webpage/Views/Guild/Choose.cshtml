@@ -6,16 +6,20 @@
 
 <h2>Choose server</h2>
 
-<div class="row">
+<ul class="guild-list">
     @foreach (var item in Model)
     {
-        <div class="col-md-4 col-lg-3 col-sm-6 col-xs-12 text-center">
-            <a class="thumbnail" href="@Url.Action("Choose", new { guildId = item.Id })">
-                <img src="@item.IconUrl" alt="" />
-                <div class="caption">
-                    <p>@item.Name</p>
-                </div>
+        <li>
+            <a class="guild-list-item" href="@Url.Action("Choose", new { guildId = item.Id })" title="@item.Name">
+                @if (string.IsNullOrWhiteSpace(item.IconUrl))
+                {
+                    <div class="guild-icon">@(string.Join("", item.Name.Split(' ').Select(w => w.First())))</div>
+                }
+                else
+                {
+                    <img class="guild-icon" src="@item.IconUrl" alt="" />
+                }
             </a>
-        </div>
+        </li>
     }
-</div>
+</ul>

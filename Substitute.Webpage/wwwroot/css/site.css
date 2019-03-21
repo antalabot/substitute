@@ -45,3 +45,43 @@ body {
         padding-bottom: 14px;
     }
 }
+
+.guild-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+}
+
+.guild-list li {
+    display: inline-block;
+    margin: 10px;
+}
+
+.guild-list .guild-list-item {
+    text-decoration: none;
+}
+
+.guild-list .guild-icon {
+    max-width: 64px;
+    max-height: 64px;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.guild-list .guild-icon:hover,
+.guild-list .guild-icon:focus,
+.guild-list .guild-icon:active {
+    border-radius: 20%;
+}
+
+.guild-list div.guild-icon {
+    text-align: center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto;
+    background-color: gray;
+    line-height: 64px;
+    font-size: 1.5em;
+    color: white;
+}
