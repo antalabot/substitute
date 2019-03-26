@@ -10,6 +10,7 @@ namespace Substitute.Domain
         private const string DISCORD_TOKEN_KEY = "DiscordToken";
         private const string PG_HOST_KEY = "PgHost";
         private const string PG_DATABASE_KEY = "PgDatabase";
+        private const string PG_PORT_KEY = "PgPort";
         private const string PG_USERNAME_KEY = "PgUsername";
         private const string PG_PASSWORD_KEY = "PgPassword";
         #endregion
@@ -55,6 +56,14 @@ namespace Substitute.Domain
             }
         }
 
+        public static string PostgresPort
+        {
+            get
+            {
+                return GetSetting(PG_PORT_KEY);
+            }
+        }
+
         public static string PostgresUsername
         {
             get
@@ -75,7 +84,7 @@ namespace Substitute.Domain
         {
             get
             {
-                return string.Format("Host={0};Database={1};Username={2};Password={3}", PostgresHost, PostgresDatabase, PostgresUsername, PostgresPassword);
+                return $"Host={PostgresHost};Port={PostgresPort ?? "5432"};Database={PostgresDatabase};Username={PostgresUsername};Password={PostgresPassword}";
             }
         }
         #endregion

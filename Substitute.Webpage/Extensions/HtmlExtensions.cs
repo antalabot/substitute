@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
+using Substitute.Business.DataStructs.User;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Substitute.Webpage.Extensions
 {
@@ -20,6 +19,11 @@ namespace Substitute.Webpage.Extensions
         public static IEnumerable<SelectListItem> ToOptionalSelectList<TKey, TValue>(this Dictionary<TKey, TValue> dictionary)
         {
             return new SelectListItem[] { new SelectListItem("Choose", null) }.Union(dictionary.ToOptionalSelectList());
+        }
+
+        public static UserDataModel GetUserData(this IHtmlHelper htmlHelper)
+        {
+            return htmlHelper.ViewBag.UserData as UserDataModel;
         }
     }
 }

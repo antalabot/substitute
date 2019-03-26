@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Substitute.Business.DataStructs.User;
 using Substitute.Business.Services;
 using Substitute.Domain.Enums;
@@ -15,9 +16,10 @@ namespace Substitute.Webpage.Controllers
     {
         #region Private constants
         private const string GUILD_ID = "GuildId";
+        private const string GUILD_DATA = "GuildData";
         private const string USER_DATA = "UserData";
         #endregion
-        
+
         #region Protected readonly variables
         protected readonly IUserService _userService;
         #endregion
@@ -28,6 +30,15 @@ namespace Substitute.Webpage.Controllers
             _userService = userService;
         }
         #endregion
+
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            base.OnActionExecuting(context);
+            if (User?.Identity?.IsAuthenticated ?? false)
+            {
+                ViewBag.UserData = GetUserData().GetAwaiter().GetResult();
+            }
+        }
 
         #region Protected helpers
         protected void SetUserGuildId(ulong serverId) => HttpContext.Session.Set(GUILD_ID, serverId);

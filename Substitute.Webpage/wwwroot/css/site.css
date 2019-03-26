@@ -39,6 +39,13 @@ body {
     padding: 0;
 }
 
+.navbar-nav .user-avatar {
+    max-width: 20px;
+    max-height: 20px;
+    border-radius: 10px;
+    margin-right: .25ex;
+}
+
 @media (min-width: 768px) {
     .navbar-nav > li > form {
         padding-top: 14px;

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Substitute.Webpage</title>
+    <title>@ViewData["Title"] > Substitute</title>
 
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
@@ -37,25 +37,30 @@
                 </a>
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                <ul class="nav navbar-nav navbar-right">
                     @if (User?.Identity?.IsAuthenticated ?? false)
                     {
-                        <li><a asp-area="" asp-controller="Home" asp-action="AboutMe">About me</a></li>
-                        <li><a asp-area="" asp-controller="Authentication" asp-action="SignOut">Sign out</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><img src="@Html.GetUserData().AvatarUrl" class="user-avatar inline-block align-top" /> @User.GetUserName() <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a asp-area="" asp-controller="Guild" asp-action="Choose">Select guild</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a asp-area="" asp-controller="Authentication" asp-action="SignOut">Sign out</a></li>
+                            </ul>
+                        </li>
                     }
                     else
                     {
                         <li><span class="navbar-text">Sign in using:</span></li>
-                        @foreach (var scheme in Context.GetExternalProvidersAsync().GetAwaiter().GetResult())
-                        {
-                            <li>
+                        <li>
+                            @foreach (var scheme in Context.GetExternalProvidersAsync().GetAwaiter().GetResult())
+                            {
                                 <form action="/signin" method="post">
                                     <input type="hidden" name="Provider" value="@scheme.Name" />
                                     <button type="submit"><i class="fab fa-@scheme.Name.ToLower() align-middle"></i></button>
                                 </form>
-                            </li>
-                        }
+                            }
+                        </li>
                     }
                 </ul>
             </div>

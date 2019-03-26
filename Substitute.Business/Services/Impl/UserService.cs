@@ -59,7 +59,7 @@ namespace Substitute.Business.Services.Impl
 
         public async Task<UserDataModel> GetUserData(string token)
         {
-            return await _cache.GetOrCreateAsync($"{CLASS_NAME}|GetGuilds|{token}", async entity =>
+            return await _cache.GetOrCreateAsync($"{CLASS_NAME}|GetUserData|{token}", async entity =>
             {
                 using (IDiscordUserRestService userService = new DiscordUserRestService(token))
                 {
