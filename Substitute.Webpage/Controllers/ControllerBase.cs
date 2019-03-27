@@ -51,7 +51,7 @@ namespace Substitute.Webpage.Controllers
             {
                 if (!HasUserData)
                 {
-                    SetUserData(await _userService.GetUserData(await HttpContext.GetUserToken()));
+                    SetUserData(await _userService.GetUserData(User.GetUserId(), await HttpContext.GetUserToken()));
                 }
             }
             return HttpContext.GetUserData();

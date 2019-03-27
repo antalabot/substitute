@@ -10,7 +10,7 @@
     @foreach (var item in Model)
     {
         <li>
-            <a class="guild-list-item" href="@Url.Action("Choose", new { guildId = item.Id })" title="@item.Name">
+            <a class="guild-list-item" href="@Url.Action("Select", new { guildId = item.Id })" title="@item.Name">
                 @if (string.IsNullOrWhiteSpace(item.IconUrl))
                 {
                     <div class="guild-icon">@(string.Join("", item.Name.Split(' ').Select(w => w.First())))</div>

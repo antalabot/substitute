@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Substitute.Business.Services;
 using Substitute.Webpage.Extensions;
@@ -27,24 +28,24 @@ namespace Substitute.Webpage.Controllers
         [HttpGet]
         public async Task<IActionResult> Choose()
         {
-            return View(await _userService.GetGuilds(await HttpContext.GetUserToken()));
+            return View(await _userService.GetGuilds(User.GetUserId(), await HttpContext.GetUserToken()));
         }
 
         [HttpGet]
         public async Task<IActionResult> Select(ulong guildId)
         {
-            if (!(await _userService.GetGuilds(await HttpContext.GetUserToken())).Any(g => g.Id == guildId && (g.CanManage || g.IsOwner)))
+            if (!(await _userService.GetGuilds(User.GetUserId(), await HttpContext.GetUserToken())).Any(g => g.Id == guildId && (g.CanManage || g.IsOwner)))
             {
                 return Unauthorized();
             }
 
             if (!await _botService.HasJoined(guildId))
             {
-                return Redirect(_botService.GetJoinLink(guildId, Url.Action("Select", "Guild", new { guildId })));
+                return Redirect(_botService.GetJoinLink(guildId, Request.GetEncodedUrl()));
             }
 
             SetUserGuildId(guildId);
-
+            
             return RedirectToAction("Index", "Home");
         }
     }

@@ -9,8 +9,8 @@ namespace Substitute.Business.Services
     public interface IUserService
     {
         Task<EAccessLevel> GetGuildAccessLevel(ulong userId, ulong guildId);
-        Task<UserDataModel> GetUserData(string token);
-        Task<IEnumerable<UserGuildModel>> GetGuilds(string token);
+        Task<UserDataModel> GetUserData(ulong userId, string token);
+        Task<IEnumerable<UserGuildModel>> GetGuilds(ulong userId, string token);
         Task<bool> IsOwnerSet();
         Task SetOwner(ulong userId, string token);
     }

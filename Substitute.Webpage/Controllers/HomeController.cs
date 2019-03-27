@@ -17,7 +17,7 @@ namespace Substitute.Webpage.Controllers
 
         public IActionResult Index()
         {
-            if (IsUserAuthenticated)
+            if (IsUserAuthenticated && !HttpContext.HasUserGuildId())
             {
                 return RedirectAuthenticated();
             }

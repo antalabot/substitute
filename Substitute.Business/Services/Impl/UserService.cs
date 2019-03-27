@@ -43,9 +43,9 @@ namespace Substitute.Business.Services.Impl
                                                  });
         }
 
-        public async Task<IEnumerable<UserGuildModel>> GetGuilds(string token)
+        public async Task<IEnumerable<UserGuildModel>> GetGuilds(ulong userId, string token)
         {
-            return await _cache.GetOrCreateAsync($"{CLASS_NAME}|GetGuilds|{token}", async entity =>
+            return await _cache.GetOrCreateAsync($"{CLASS_NAME}|GetGuilds|{userId}", async entity =>
             {
                 using (IDiscordUserRestService userService = new DiscordUserRestService(token))
                 {
@@ -57,15 +57,15 @@ namespace Substitute.Business.Services.Impl
             });
         }
 
-        public async Task<UserDataModel> GetUserData(string token)
+        public async Task<UserDataModel> GetUserData(ulong userId, string token)
         {
-            return await _cache.GetOrCreateAsync($"{CLASS_NAME}|GetUserData|{token}", async entity =>
+            return await _cache.GetOrCreateAsync($"{CLASS_NAME}|GetUserData|{userId}", async entity =>
             {
                 using (IDiscordUserRestService userService = new DiscordUserRestService(token))
                 {
                     entity.SlidingExpiration = _getGuildsExpiration;
                     UserDataModel data = userService.GetData();
-                    User user = await _context.GetByIdAsync<User>(data.Id);
+                    User user = await _context.GetByIdAsync<User>(userId);
                     if (user != null)
                     {
                         data.Role = user.Role;
@@ -89,6 +89,7 @@ namespace Substitute.Business.Services.Impl
                 {
                     Id = userId
                 };
+                _context.Add(user);
             }
             user.Role = ERole.Owner;
             _context.SaveChanges();
