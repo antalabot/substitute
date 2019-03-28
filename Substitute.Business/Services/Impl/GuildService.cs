@@ -23,6 +23,7 @@ namespace Substitute.Business.Services.Impl
         private readonly IContext _context;
         
         private readonly TimeSpan _getGuildRolesExpiration = TimeSpan.FromMinutes(5);
+        private readonly TimeSpan _getGuildDataExpiration = TimeSpan.FromMinutes(5);
         #endregion
 
         public GuildService(IDiscordBotRestService botService, ICache cache, IContext context)
@@ -30,6 +31,16 @@ namespace Substitute.Business.Services.Impl
             _botService = botService;
             _cache = cache;
             _context = context;
+        }
+
+        public async Task<GuildModel> GetGuildData(ulong guildId)
+        {
+            return await _cache.GetOrCreateAsync($"{CLASS_NAME}|GetGuildData|{guildId}",
+                                                 async entity =>
+                                                 {
+                                                     entity.SlidingExpiration = _getGuildDataExpiration;
+                                                     return await _botService.GetGuild(guildId);
+                                                 });
         }
 
         public async Task<IEnumerable<RoleDigestModel>> GetRoles(RoleFilterModel model)

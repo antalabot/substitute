@@ -25,10 +25,10 @@ namespace Substitute.Business.Services.Impl
         #endregion
 
         #region Implementation of IDiscordUserRestService
-        public async Task<IEnumerable<UserGuildModel>> GetGuilds()
+        public async Task<IEnumerable<DataStructs.Guild.UserGuildModel>> GetGuilds()
         {
             IEnumerable<RestUserGuild> list = await _discordClient.GetGuildSummariesAsync().FlattenAsync();
-            return list.Select(g => new UserGuildModel
+            return list.Select(g => new DataStructs.Guild.UserGuildModel
             {
                 CanManage = g.Permissions.ManageGuild,
                 IconUrl = g.IconUrl,

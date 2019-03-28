@@ -13,8 +13,8 @@ namespace Substitute.Webpage.Controllers
     {
         private readonly IBotService _botService;
 
-        public GuildController(IBotService botService, IUserService userService)
-            : base(userService)
+        public GuildController(IBotService botService, IUserService userService, IGuildService guildService)
+            : base(userService, guildService)
         {
             _botService = botService;
         }

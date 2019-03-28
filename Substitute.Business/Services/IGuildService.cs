@@ -10,6 +10,7 @@ namespace Substitute.Business.Services
 {
     public interface IGuildService
     {
+        Task<GuildModel> GetGuildData(ulong guildId);
         Task<IEnumerable<RoleDigestModel>> GetRoles(RoleFilterModel model);
         Task SetRoleAccessLevel(RoleModel role);
     }

@@ -14,7 +14,7 @@ namespace Substitute.Domain.Data
         #endregion
 
         #region Constructor
-        Snowflake()
+        public Snowflake()
         {
             _machineId = 0;
             _sequenceLock = new object();

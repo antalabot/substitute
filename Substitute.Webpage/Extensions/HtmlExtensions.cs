@@ -25,5 +25,10 @@ namespace Substitute.Webpage.Extensions
         {
             return htmlHelper.ViewBag.UserData as UserDataModel;
         }
+
+        public static UserGuildModel GetGuildData(this IHtmlHelper htmlHelper)
+        {
+            return htmlHelper.ViewBag.GuildData as UserGuildModel;
+        }
     }
 }

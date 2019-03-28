@@ -1,4 +1,5 @@
-﻿@using Substitute.Webpage.Extensions
+﻿@using Substitute.Domain.Enums
+@using Substitute.Webpage.Extensions
 <!DOCTYPE html>
 <html>
 <head>
@@ -41,9 +42,27 @@
                     @if (User?.Identity?.IsAuthenticated ?? false)
                     {
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><img src="@Html.GetUserData().AvatarUrl" class="user-avatar inline-block align-top" /> @User.GetUserName() <span class="caret"></span></a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                <img src="@Html.GetUserData().AvatarUrl" class="user-avatar inline-block align-top" />
+                                @User.GetUserName()
+                                @if (Html.GetGuildData() != null)
+                                {
+                                    <text>@@</text>
+                                    <img src="@Html.GetGuildData().IconUrl" class="guild-avatar inline-block align-top" /> @Html.GetGuildData().Name
+                                }
+                                <span class="caret"></span>
+                            </a>
                             <ul class="dropdown-menu">
-                                <li><a asp-area="" asp-controller="Guild" asp-action="Choose">Select guild</a></li>
+                                @if (Html.GetGuildData() != null)
+                                {
+                                    if (Html.GetGuildData().AccessLevel == EAccessLevel.Owner)
+                                    {
+                                        <li><a asp-area="" asp-controller="Role" asp-action="Index">Manage access levels</a></li>
+                                    }
+                                    <li><a asp-area="" asp-controller="ImageResponse" asp-action="Index">Bot images</a></li>
+                                    <li role="separator" class="divider"></li>
+                                }
+                                <li><a asp-area="" asp-controller="Guild" asp-action="Choose">Select server</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li><a asp-area="" asp-controller="Authentication" asp-action="SignOut">Sign out</a></li>
                             </ul>

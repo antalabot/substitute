@@ -10,8 +10,8 @@ namespace Substitute.Webpage.Controllers
 {
     public class HomeController : ControllerBase
     {
-        public HomeController(IUserService userService)
-            : base(userService)
+        public HomeController(IUserService userService, IGuildService guildService)
+            : base(userService, guildService)
         {
         }
 

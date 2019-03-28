@@ -10,8 +10,8 @@ namespace Substitute.Webpage.Controllers
 {
     public class AuthenticationController : ControllerBase
     {
-        public AuthenticationController(IUserService userService)
-            : base(userService)
+        public AuthenticationController(IUserService userService, IGuildService guildService)
+            : base(userService, guildService)
         {
 
         }

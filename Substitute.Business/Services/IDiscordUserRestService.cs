@@ -8,7 +8,7 @@ namespace Substitute.Business.Services
 {
     public interface IDiscordUserRestService : IDisposable
     {
-        Task<IEnumerable<UserGuildModel>> GetGuilds();
+        Task<IEnumerable<DataStructs.Guild.UserGuildModel>> GetGuilds();
         UserDataModel GetData();
     }
 }

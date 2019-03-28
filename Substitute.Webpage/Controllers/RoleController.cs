@@ -12,16 +12,13 @@ namespace Substitute.Webpage.Controllers
     [Authorize]
     public class RoleController : ControllerBase
     {
-        private readonly IGuildService _guildService;
-
-        public RoleController(IGuildService guildService, IUserService userService)
-            : base(userService)
+        public RoleController(IUserService userService, IGuildService guildService)
+            : base(userService, guildService)
         {
-            _guildService = guildService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(RoleFilterModel model) => await CheckPrivilages(EAccessLevel.Owner) ?? View(await GetResultAsync(async () => await _guildService.GetRoles(model ?? new RoleFilterModel())));
+        public async Task<IActionResult> Index(RoleFilterModel model) => await CheckPrivilages(EAccessLevel.Owner) ?? View(await _guildService.GetRoles(model ?? new RoleFilterModel()));
         
         [HttpPost]
         public async Task<IActionResult> SetAccessLevel(RoleModel model)

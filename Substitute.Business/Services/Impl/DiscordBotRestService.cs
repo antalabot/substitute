@@ -53,6 +53,18 @@ namespace Substitute.Business.Services.Impl
                 OwnerId = g.OwnerId
             });
         }
+
+        public async Task<GuildModel> GetGuild(ulong guildId)
+        {
+            RestGuild data = await _discordClient.GetGuildAsync(guildId);
+            return new GuildModel
+            {
+                IconUrl = data.IconUrl,
+                Id = data.Id,
+                Name = data.Name,
+                OwnerId = data.OwnerId
+            };
+        }
         #endregion
     }
 }

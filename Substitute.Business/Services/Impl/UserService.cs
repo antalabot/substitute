@@ -16,41 +16,68 @@ namespace Substitute.Business.Services.Impl
         private const string CLASS_NAME = "USER";
         #endregion
 
+        private readonly IGuildService _guildService;
         private readonly IDiscordBotRestService _botService;
         private readonly ICache _cache;
         private readonly IContext _context;
 
         private readonly TimeSpan _getGuildsExpiration = TimeSpan.FromMinutes(5);
-        private readonly TimeSpan _getGuildUserAccessLevelExpiration = TimeSpan.FromMinutes(15);
+        private readonly TimeSpan _getGuildUserAccessLevelExpiration = TimeSpan.FromMinutes(1);
 
-        public UserService(IDiscordBotRestService botService, ICache cache, IContext context)
+        public UserService(IGuildService guildService, IDiscordBotRestService botService, ICache cache, IContext context)
         {
+            _guildService = guildService;
             _botService = botService;
             _cache = cache;
             _context = context;
         }
 
-        public async Task<EAccessLevel> GetGuildAccessLevel(ulong userId, ulong guildId)
+        public async Task<EAccessLevel> GetGuildAccessLevel(ulong userId, string token, ulong guildId)
         {
             return await _cache.GetOrCreateAsync($"{CLASS_NAME}|GetGuildAccessLevel|{guildId}|{userId}",
                                                  async entity =>
                                                  {
                                                      entity.SlidingExpiration = _getGuildUserAccessLevelExpiration;
 
+                                                     using (IDiscordUserRestService userService = new DiscordUserRestService(token))
+                                                     {
+                                                         if ((await userService.GetGuilds()).Any(g => g.Id == guildId && g.IsOwner))
+                                                         {
+                                                             return EAccessLevel.Owner;
+                                                         }
+                                                     }
+
                                                      IEnumerable<RoleModel> userGuildRoles = await _botService.GetGuildUserRoles(guildId, userId);
                                                      IEnumerable<GuildRole> guildRoles = (await _context.GetAsync<GuildRole>()).Where(r => r.GuildId == guildId);
+                                                     if (!userGuildRoles.Any() && !guildRoles.Any())
+                                                     {
+                                                         return EAccessLevel.User;
+                                                     }
                                                      return userGuildRoles.Join(guildRoles, ugr => ugr.Id, gr => gr.Id, (ugr, gr) => ugr.AccessLevel).Min();
                                                  });
         }
 
-        public async Task<IEnumerable<UserGuildModel>> GetGuilds(ulong userId, string token)
+        public async Task<DataStructs.User.UserGuildModel> GetGuildData(ulong userId, string token, ulong guildId)
+        {
+            EAccessLevel accessLevel = await GetGuildAccessLevel(userId, token, guildId);
+            var guildData = await _guildService.GetGuildData(guildId);
+            return new DataStructs.User.UserGuildModel
+            {
+                AccessLevel = accessLevel,
+                IconUrl = guildData.IconUrl,
+                Id = guildData.Id,
+                Name = guildData.Name
+            };
+        }
+
+        public async Task<IEnumerable<DataStructs.Guild.UserGuildModel>> GetGuilds(ulong userId, string token)
         {
             return await _cache.GetOrCreateAsync($"{CLASS_NAME}|GetGuilds|{userId}", async entity =>
             {
                 using (IDiscordUserRestService userService = new DiscordUserRestService(token))
                 {
                     entity.SlidingExpiration = _getGuildsExpiration;
-                    IEnumerable<UserGuildModel> userGuilds = await userService.GetGuilds();
+                    IEnumerable<DataStructs.Guild.UserGuildModel> userGuilds = await userService.GetGuilds();
                     IEnumerable<GuildModel> botGuilds = await _botService.GetGuilds();
                     return userGuilds.Where(g => g.IsOwner || g.CanManage || botGuilds.Any(b => b.Id == g.Id));
                 }

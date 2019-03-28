@@ -22,12 +22,14 @@ namespace Substitute.Webpage.Controllers
 
         #region Protected readonly variables
         protected readonly IUserService _userService;
+        protected readonly IGuildService _guildService;
         #endregion
 
         #region Constructor
-        public ControllerBase(IUserService userService)
+        public ControllerBase(IUserService userService, IGuildService guildService)
         {
             _userService = userService;
+            _guildService = guildService;
         }
         #endregion
 
@@ -37,6 +39,10 @@ namespace Substitute.Webpage.Controllers
             if (User?.Identity?.IsAuthenticated ?? false)
             {
                 ViewBag.UserData = GetUserData().GetAwaiter().GetResult();
+                if (HasUserGuildId)
+                {
+                    ViewBag.GuildData = _userService.GetGuildData(User.GetUserId(), HttpContext.GetUserToken().GetAwaiter().GetResult(), UserGuildId.GetValueOrDefault()).GetAwaiter().GetResult();
+                }
             }
         }
 
@@ -170,7 +176,7 @@ namespace Substitute.Webpage.Controllers
 
         protected async Task<bool> HasGuildAccessLevel(ulong userId, ulong guildId, EAccessLevel accessLevel)
         {
-            EAccessLevel userAccessLevel = await _userService.GetGuildAccessLevel(userId, guildId);
+            EAccessLevel userAccessLevel = await _userService.GetGuildAccessLevel(userId, await HttpContext.GetUserToken(), guildId);
             switch (accessLevel)
             {
                 case EAccessLevel.Administrator:

@@ -16,8 +16,8 @@ namespace Substitute.Webpage.Controllers
         #endregion
 
         #region Constructor
-        public ImageResponseController(IImageResponseService imageResponseService, IUserService userService)
-            : base(userService) => _imageResponseService = imageResponseService;
+        public ImageResponseController(IImageResponseService imageResponseService, IUserService userService, IGuildService guildService)
+            : base(userService, guildService) => _imageResponseService = imageResponseService;
         #endregion
 
         #region Views
