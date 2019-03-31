@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Substitute.Domain.DataStore.Impl
 {
-    public class PgContext : DbContext, IContext
+    public class PgContext : DbContext, ISingletonContext, IContext
     {
         #region Database Sets
         public DbSet<User> Users { get; set; }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Substitute.Bot;
 using Substitute.Business.Services;
 using Substitute.Business.Services.Impl;
 using Substitute.Domain;
@@ -69,6 +70,7 @@ namespace Substitute.Webpage
             #region Register services
             #region Domain services
             services.AddScoped<IContext, PgContext>();
+            services.AddSingleton<ISingletonContext, PgContext>();
             services.AddSingleton<ICache, InMemoryCache>();
             services.AddSingleton<IStorage, FileStorage>();
             services.AddSingleton<ISnowflake, Snowflake>();
@@ -79,6 +81,9 @@ namespace Substitute.Webpage
             services.AddScoped<IImageResponseService, ImageResponseService>();
             services.AddScoped<IUserService, UserService>();
             services.AddSingleton<IDiscordBotRestService, DiscordBotRestService>();
+            #endregion
+            #region Bot
+            services.AddSingleton<IDiscordBot, DiscordBot>();
             #endregion
             #endregion
 
@@ -97,6 +102,8 @@ namespace Substitute.Webpage
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+
+            app.ApplicationServices.GetService<IDiscordBot>().LoginAndStart();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
