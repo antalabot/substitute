@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Npgsql;
 using Substitute.Domain.Data;
 using Substitute.Domain.Data.Entities;
@@ -14,6 +15,14 @@ namespace Substitute.Domain.DataStore.Impl
 {
     public class PgContext : DbContext, ISingletonContext, IContext
     {
+        #region Private constants
+        private const string PG_CONNECTION_STRING_KEY = "SubstituteDatabase";
+        #endregion
+
+        #region Private readonly variables
+        private readonly IConfiguration _configuration;
+        #endregion
+
         #region Database Sets
         public DbSet<User> Users { get; set; }
         public DbSet<GuildRole> GuildRoles { get; set; }
@@ -21,14 +30,15 @@ namespace Substitute.Domain.DataStore.Impl
         #endregion
 
         #region Configuration
-        public PgContext()
+        public PgContext(IConfiguration configuration)
         {
+            _configuration = configuration;
             NpgsqlConnection.GlobalTypeMapper.MapEnum<EAccessLevel>();
             NpgsqlConnection.GlobalTypeMapper.MapEnum<ERole>();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseNpgsql(Settings.PostgresConnectionString);
+            => optionsBuilder.UseNpgsql(_configuration.GetConnectionString(PG_CONNECTION_STRING_KEY));
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         { 

@@ -1,4 +1,5 @@
 ﻿using Discord.WebSocket;
+using Microsoft.Extensions.Configuration;
 using Substitute.Domain;
 using Substitute.Domain.Data.Entities;
 using Substitute.Domain.DataStore;
@@ -11,14 +12,18 @@ namespace Substitute.Bot
 {
     public class DiscordBot : IDiscordBot
     {
+        private const string DISCORD_TOKEN_KEY = "Discord:Token";
+
         private readonly IStorage _storage;
         private readonly ISingletonContext _context;
+        private readonly IConfiguration _configuration;
         private readonly DiscordSocketClient _client;
 
-        public DiscordBot(IStorage storage, ISingletonContext context)
+        public DiscordBot(IStorage storage, ISingletonContext context, IConfiguration configuration)
         {
             _storage = storage;
             _context = context;
+            _configuration = configuration;
             _client = new DiscordSocketClient();
 
             Configure();
@@ -26,7 +31,7 @@ namespace Substitute.Bot
 
         public async Task LoginAndStart()
         {
-            await _client.LoginAsync(Discord.TokenType.Bot, Settings.DiscordToken);
+            await _client.LoginAsync(Discord.TokenType.Bot, _configuration[DISCORD_TOKEN_KEY]);
             await _client.StartAsync();
         }
 

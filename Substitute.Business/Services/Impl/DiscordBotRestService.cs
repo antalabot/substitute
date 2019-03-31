@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Rest;
+using Microsoft.Extensions.Configuration;
 using Substitute.Business.DataStructs.Guild;
 using Substitute.Domain;
 using Substitute.Domain.DataStore;
@@ -14,12 +15,13 @@ namespace Substitute.Business.Services.Impl
     public class DiscordBotRestService : DiscordRestServiceBase, IDiscordBotRestService
     {
         #region Private constants
+        private const string DISCORD_TOKEN_KEY = "DiscordToken";
         private const string CLASS_NAME = "DiscordBotRestService";
         #endregion
         
         #region Constructor and destructor
-        public DiscordBotRestService()
-            : base(TokenType.Bot, Settings.DiscordToken)
+        public DiscordBotRestService(IConfiguration configuration)
+            : base(TokenType.Bot, configuration[DISCORD_TOKEN_KEY])
         {
         }
         #endregion

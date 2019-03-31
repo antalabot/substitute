@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +18,9 @@ namespace Substitute.Webpage
 {
     public class Startup
     {
+        private const string DISCORD_ID_KEY = "Discord:Id";
+        private const string DISCORD_SECRET_KEY = "Discord:Secret";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -55,11 +59,11 @@ namespace Substitute.Webpage
                 options.LoginPath = "/signin";
                 options.LogoutPath = "/signout";
             })
-
+            
             .AddDiscord(options =>
             {
-                options.ClientId = Settings.DiscordId;
-                options.ClientSecret = Settings.DiscordSecret;
+                options.ClientId = Configuration[DISCORD_ID_KEY];
+                options.ClientSecret = Configuration[DISCORD_SECRET_KEY];
                 options.SaveTokens = true;
                 options.Scope.Add("identify");
                 options.Scope.Add("guilds");
@@ -101,6 +105,10 @@ namespace Substitute.Webpage
             {
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
+                app.UseForwardedHeaders(new ForwardedHeadersOptions
+                {
+                    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+                });
             }
 
             app.ApplicationServices.GetService<IDiscordBot>().LoginAndStart();
@@ -109,7 +117,7 @@ namespace Substitute.Webpage
             app.UseStaticFiles();
             app.UseCookiePolicy();
             app.UseSession();
-
+            
             app.UseAuthentication();
 
             app.UseMvc(routes =>
