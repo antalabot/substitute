@@ -16,7 +16,6 @@ namespace Substitute.Domain.DataStore.Impl
     {
         #region Database Sets
         public DbSet<User> Users { get; set; }
-        public DbSet<Guild> Guilds { get; set; }
         public DbSet<GuildRole> GuildRoles { get; set; }
         public DbSet<ImageResponse> ImageReponses { get; set; }
         #endregion

@@ -43,7 +43,7 @@ namespace Substitute.Business.Services.Impl
                                                  });
         }
 
-        public async Task<IEnumerable<RoleDigestModel>> GetRoles(RoleFilterModel model)
+        public async Task<RoleResultsModel> GetRoles(RoleFilterModel model)
         {
             IEnumerable<RoleDigestModel> list = await _cache.GetOrCreateAsync($"{CLASS_NAME}|GetRoles|{model.GuildId}",
                                                                               async entity =>
@@ -57,7 +57,7 @@ namespace Substitute.Business.Services.Impl
                                                                                       AccessLevel = db.SingleOrDefault()?.AccessLevel ?? EAccessLevel.User,
                                                                                       Id = rest.Id,
                                                                                       Name = rest.Name
-                                                                                  });
+                                                                                  }).ToArray();
                                                                               });
             if (!string.IsNullOrWhiteSpace(model.Name))
             {
@@ -68,6 +68,11 @@ namespace Substitute.Business.Services.Impl
             {
                 list = list.Where(r => r.AccessLevel == model.AccessLevel.Value);
             }
+
+            RoleResultsModel result = new RoleResultsModel(model)
+            {
+                Total = list.Count()
+            };
 
             Func<RoleDigestModel, object> sortFieldSelector = r => r.Id;
             switch (model.SortBy)
@@ -95,7 +100,9 @@ namespace Substitute.Business.Services.Impl
                     throw new NotImplementedException();
             }
 
-            return model.PerPage == 0 ? list : list.Skip(model.PerPage * (model.Page - 1)).Take(model.PerPage);
+            result.Items = (model.PerPage == 0 ? list : list.Skip(model.PerPage * (model.Page - 1)).Take(model.PerPage)).ToArray();
+            
+            return result;
         }
         
         public async Task SetRoleAccessLevel(RoleModel role)
@@ -112,17 +119,20 @@ namespace Substitute.Business.Services.Impl
                 GuildRole model = await _context.GetByIdAsync<GuildRole>(role.Id);
                 if (model == null)
                 {
+                    IEnumerable<RoleModel> guildRoles = await _botService.GetGuildRoles(role.GuildId);
+                    RoleModel guildRole = guildRoles.Single(r => r.Id == role.Id);
                     model = new GuildRole
                     {
                         GuildId = role.GuildId,
                         Id = role.Id,
-                        Name = role.Name
+                        Name = guildRole.Name
                     };
                     await _context.AddAsync(model);
                 }
                 model.AccessLevel = role.AccessLevel;
             }
             _context.SaveChanges();
+            _cache.Remove($"{CLASS_NAME}|GetRoles|{role.GuildId}");
         }
     }
 }

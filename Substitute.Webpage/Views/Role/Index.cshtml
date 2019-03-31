@@ -1,32 +1,38 @@
 ﻿@model Substitute.Business.DataStructs.Role.RoleResultsModel
 @using Substitute.Webpage.Extensions
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Roles access levels";
 }
 
-<h2>Index</h2>
+<h2>@ViewData["Title"]</h2>
 
-@using (Html.BeginForm("Index", "Role", FormMethod.Get))
+@using (Html.BeginForm("Index", "Role", FormMethod.Get, new { @class = "row" }))
 {
+<div class="col-md-6">
     <div class="input-group">
         <span class="input-group-addon" id="basic-addon1">Name:</span>
         @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Name", ariaDescribedby = "basic-addon1" })
     </div>
+</div>
+<div class="col-md-5">
     <div class="input-group">
         <span class="input-group-addon" id="basic-addon1">Access level:</span>
         @Html.DropDownListFor(m => m.AccessLevel, Model.AccessLevels.ToOptionalSelectList(), new { @class = "form-control" })
     </div>
-    <button type="button" class="btn btn-default"><i class="fas fa-search"></i></button>
+</div>
+<div class="col-md-1">
+    <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+</div>
 }
 
 <table class="table">
     <thead>
         <tr>
             <th>
-                Name
+                Role name
             </th>
             <th>
-                Access level
+                Current access level
             </th>
             <th></th>
         </tr>
@@ -42,11 +48,11 @@
                     @Html.DisplayFor(modelItem => item.AccessLevel)
                 </td>
                 <td>
-                    @using (Html.BeginForm("SetAccessLevel", "Role", FormMethod.Post))
+                    @using (Html.BeginForm("SetAccessLevel", "Role", FormMethod.Post, new { @class = "input-group" }))
                     {
-                        @Html.DropDownListFor(modelItem => item.AccessLevel, Model.AccessLevels.ToSelectList())
-                        @Html.HiddenFor(modelItem => item.Id)
-                        <button type="button" class="btn btn-default"><i class="fas fa-save"></i></button>
+                        @Html.DropDownList("AccessLevel", Model.AccessLevels.ToSelectList((byte)item.AccessLevel), new { @class = "form-control" })
+                        <span class="input-group-btn"><button type="submit" class="btn btn-default"><i class="fas fa-save"></i></button></span>
+                        @Html.Hidden("Id", item.Id)
                     }
                 </td>
             </tr>
@@ -72,7 +78,7 @@
                 </a>
             </li>
         }
-        @for (int i = 1; i < Model.Pages; i++)
+        @for (int i = 1; i <= Model.Pages; i++)
         {
             if (i == Model.Page)
             {

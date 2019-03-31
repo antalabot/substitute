@@ -6,7 +6,6 @@ namespace Substitute.Domain.Data.Entities
     public class GuildRole : EntityBase, IEntity
     {
         public ulong GuildId { get; set; }
-        public Guild Guild { get; set; }
         [Required]
         public string Name { get; set; }
         public EAccessLevel AccessLevel { get; set; }

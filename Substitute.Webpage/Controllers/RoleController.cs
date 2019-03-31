@@ -5,6 +5,7 @@ using Substitute.Business.DataStructs.Guild;
 using Substitute.Business.DataStructs.Role;
 using Substitute.Business.Services;
 using Substitute.Domain.Enums;
+using Substitute.Webpage.Extensions;
 using System.Threading.Tasks;
 
 namespace Substitute.Webpage.Controllers
@@ -18,7 +19,13 @@ namespace Substitute.Webpage.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(RoleFilterModel model) => await CheckPrivilages(EAccessLevel.Owner) ?? View(await _guildService.GetRoles(model ?? new RoleFilterModel()));
+        public async Task<IActionResult> Index(RoleFilterModel model)
+        {
+            model = model ?? new RoleFilterModel();
+            model.GuildId = UserGuildId.GetValueOrDefault();
+            model.UserId = User.GetUserId();
+            return await CheckPrivilages(EAccessLevel.Owner) ?? View(await _guildService.GetRoles(model));
+        }
         
         [HttpPost]
         public async Task<IActionResult> SetAccessLevel(RoleModel model)
@@ -30,7 +37,7 @@ namespace Substitute.Webpage.Controllers
         private async Task<IActionResult> SetAccessLevelPrivate(RoleModel model)
         {
             await _guildService.SetRoleAccessLevel(model);
-            return Redirect(HttpContext?.Request?.GetDisplayUrl());
+            return Redirect(Request.Headers["Referer"].ToString());
         }
     }
 }
