@@ -20,7 +20,7 @@ body {
     vertical-align: middle;
 }
 
-.navbar-brand > .inline-block {
+.navbar-brand > .inline-block, td .inline-block {
     display: inline-block;
 }
 

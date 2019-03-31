@@ -25,7 +25,7 @@
 </div>
 }
 
-<table class="table">
+<table class="table table-striped table-hover">
     <thead>
         <tr>
             <th>
@@ -51,7 +51,7 @@
                     @using (Html.BeginForm("SetAccessLevel", "Role", FormMethod.Post, new { @class = "input-group" }))
                     {
                         @Html.DropDownList("AccessLevel", Model.AccessLevels.ToSelectList((byte)item.AccessLevel), new { @class = "form-control" })
-                        <span class="input-group-btn"><button type="submit" class="btn btn-default"><i class="fas fa-save"></i></button></span>
+                        <span class="input-group-btn"><button type="submit" class="btn btn-warning"><i class="fas fa-save"></i></button></span>
                         @Html.Hidden("Id", item.Id)
                     }
                 </td>
@@ -60,52 +60,4 @@
     </tbody>
 </table>
 
-<nav aria-label="Pagination">
-    <ul class="pagination">
-        @if (Model.Page == 1)
-        {
-            <li class="disabled">
-                <span>
-                    <span aria-hidden="true">&laquo;</span>
-                </span>
-            </li>
-        }
-        else
-        {
-            <li>
-                <a href="@Url.Action("Index", "Role", Model.ChangePage(Model.Page - 1))" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-        }
-        @for (int i = 1; i <= Model.Pages; i++)
-        {
-            if (i == Model.Page)
-            {
-                <li class="active">
-                    <span>@i <span class="sr-only">(current)</span></span>
-                </li>
-            }
-            else
-            {
-                <li><a href="@Url.Action("Index", "Role", Model.ChangePage(i))">@i</a></li>
-            }
-        }
-        @if (Model.Page == Model.Pages)
-        {
-            <li class="disabled">
-                <span>
-                    <span aria-hidden="true">&raquo;</span>
-                </span>
-            </li>
-        }
-        else
-        {
-            <li>
-                <a href="@Url.Action("Index", "Role", Model.ChangePage(Model.Page + 1))" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-        }
-    </ul>
-</nav>
+<partial name="Paging" model="Model"/>

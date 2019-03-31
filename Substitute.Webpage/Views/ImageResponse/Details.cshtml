@@ -1,0 +1,46 @@
+﻿@model Substitute.Business.DataStructs.ImageResponse.ImageResponseModel
+@using Substitute.Domain.Enums
+@using Substitute.Webpage.Extensions
+@{
+    ViewData["Title"] = $"{Model.Command} image response";
+    bool canEdit = new EAccessLevel[] { EAccessLevel.Administrator, EAccessLevel.Moderator, EAccessLevel.Owner }.Contains(Html.GetGuildData().AccessLevel);
+}
+
+<h2><a href="@Model.ReturnUrl" class="btn btn-lg btn-default"><i class="fas fa-arrow-left"></i></a> @ViewData["Title"]</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <a href="@Url.Action("Image", "ImageResponse", new { Id = Model.Id })" class="thumbnail">
+            <img src="@Url.Action("Image", "ImageResponse", new { Id = Model.Id })" alt="@Model.Filename" />
+        </a>
+    </div>
+    @if (canEdit)
+    {
+    <div class="col-md-6">
+        @using (Html.BeginForm("Update", "ImageResponse", FormMethod.Post, new { @class = "row", enctype = "multipart/form-data" }))
+        {
+            @Html.Hidden("ReturnUrl", Model.ReturnUrl)
+            @Html.Hidden("Id", Model.Id)
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon2">Command:</span>
+                @Html.TextBox("Command", Model.Command, new { @class = "form-control", placeholder = "Command", ariaDescribedby = "basic-addon2" })
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon3">File:</span>
+                @Html.TextBox("Command", null, new { @class = "form-control", type = "file", placeholder = "File", ariaDescribedby = "basic-addon3" })
+            </div>
+            <button type="submit" class="btn btn-warning"><i class="fas fa-save"></i></button>
+        }
+    </div>
+    }
+</div>
+
+@if (canEdit)
+{
+    using (Html.BeginForm("Delete", "ImageResponse", FormMethod.Post, new { @class = "input-group" }))
+    {
+        <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i></button>
+        @Html.Hidden("id", Model.Id)
+        @Html.Hidden("returnUrl", Model.ReturnUrl)
+    }
+}

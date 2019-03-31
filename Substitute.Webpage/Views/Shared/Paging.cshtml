@@ -1,0 +1,51 @@
+﻿@model Substitute.Business.DataStructs.ResultBase
+
+<nav aria-label="Pagination">
+    <ul class="pagination">
+        @if (Model.Page == 1)
+        {
+            <li class="disabled">
+                <span>
+                    <span aria-hidden="true">&laquo;</span>
+                </span>
+            </li>
+        }
+        else
+        {
+            <li>
+                <a href="@Url.Action("Index", Model.ChangePage(Model.Page - 1))" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+        }
+        @for (int i = 1; i <= Model.Pages; i++)
+        {
+            if (i == Model.Page)
+            {
+                <li class="active">
+                    <span>@i <span class="sr-only">(current)</span></span>
+                </li>
+            }
+            else
+            {
+                <li><a href="@Url.Action("Index", Model.ChangePage(i))">@i</a></li>
+            }
+        }
+        @if (Model.Page == Model.Pages || Model.Pages == 0)
+        {
+            <li class="disabled">
+                <span>
+                    <span aria-hidden="true">&raquo;</span>
+                </span>
+            </li>
+        }
+        else
+        {
+            <li>
+                <a href="@Url.Action("Index", Model.ChangePage(Model.Page + 1))" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        }
+    </ul>
+</nav>
