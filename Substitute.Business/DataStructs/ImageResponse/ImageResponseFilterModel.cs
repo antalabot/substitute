@@ -2,7 +2,7 @@
 
 namespace Substitute.Business.DataStructs.ImageResponse
 {
-    public class ImageResponseFilterModel : FilterBase
+    public class ImageResponseFilterModel : FilterBase, IImageResponseFilter
     {
         public ImageResponseFilterModel()
             : base()

@@ -16,5 +16,7 @@ namespace Substitute.Business.DataStructs
         public int Pages => Convert.ToInt32(Math.Ceiling((double)Total / PerPage));
 
         public int Total { get; set; }
+
+        public abstract FilterBase ChangePage(int page);
     }
 }

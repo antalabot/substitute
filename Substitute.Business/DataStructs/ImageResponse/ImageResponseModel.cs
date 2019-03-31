@@ -4,5 +4,6 @@
     {
         public ulong? GuildId { get; set; }
         public byte[] Image { get; set; }
+        public string ReturnUrl { get; set; }
     }
 }

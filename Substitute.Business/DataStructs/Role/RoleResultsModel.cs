@@ -27,7 +27,7 @@ namespace Substitute.Business.DataStructs.Role
         public IEnumerable<RoleDigestModel> Items { get; set; }
         public Dictionary<byte, string> AccessLevels => new EAccessLevel[] { EAccessLevel.User, EAccessLevel.Moderator, EAccessLevel.Administrator }.ToDictionary(k => (byte)k, v => v.ToString());
 
-        public RoleFilterModel ChangePage(int page)
+        public override FilterBase ChangePage(int page)
         {
             return new RoleFilterModel
             {

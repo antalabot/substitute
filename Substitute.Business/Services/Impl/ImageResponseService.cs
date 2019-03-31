@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Substitute.Business.DataStructs.Enum;
 using Substitute.Business.DataStructs.Exceptions;
 using Substitute.Business.DataStructs.ImageResponse;
 using Substitute.Domain.Data;
@@ -31,14 +32,19 @@ namespace Substitute.Business.Services.Impl
         }
         #endregion
 
-        public async Task<ulong> Create(ImageResponseModel imageResponse)
+        public async Task<ImageResponseModel> Create(ImageResponseModel imageResponse)
         {
             bool exists = _context.Get<ImageResponse>().Any(r => r.Command == imageResponse.Command);
             if (exists)
             {
                 throw new CommandExistsException();
             }
-            
+
+            if (imageResponse.Image == null)
+            {
+                throw new MissingFieldException();
+            }
+
             string filename = $"{imageResponse.Command}{Path.GetExtension(imageResponse.Filename)}";
             ImageResponse model = new ImageResponse
             {
@@ -61,16 +67,24 @@ namespace Substitute.Business.Services.Impl
                 _storage.Delete(EStorage.ImageResponse, filename, imageResponse.GuildId.ToString());
                 throw ex;
             }
+            
+            imageResponse.Id = model.Id;
+            imageResponse.Filename = model.Fielename;
 
-            return model.Id;
+            return imageResponse;
         }
 
-        public async Task Delete(ulong id)
+        public async Task Delete(ulong id, ulong? guildId)
         {
             ImageResponse image = await _context.GetByIdAsync<ImageResponse>(id);
             if (image == null)
             {
                 throw new CommandNotExistsException();
+            }
+
+            if (image.GuildId != guildId)
+            {
+                throw new UnauthorizedAccessException();
             }
 
             await _context.RemoveByIdAsync<ImageResponse>(id);
@@ -78,7 +92,7 @@ namespace Substitute.Business.Services.Impl
             _storage.Delete(EStorage.ImageResponse, image.Fielename, image.GuildId.ToString());
         }
 
-        public async Task<ImageResponseModel> Details(ulong id)
+        public async Task<ImageResponseModel> Details(ulong id, string returnUrl)
         {
             ImageResponse image = await _context.GetByIdAsync<ImageResponse>(id);
             if (image == null)
@@ -86,7 +100,7 @@ namespace Substitute.Business.Services.Impl
                 throw new CommandNotExistsException();
             }
 
-            return await GetModel(image);
+            return await GetModel(image, returnUrl);
         }
 
         public async Task<ImageResponseModel> GetImageByCommand(string command, ulong guildId)
@@ -96,15 +110,15 @@ namespace Substitute.Business.Services.Impl
             {
                 throw new CommandNotExistsException();
             }
-            
+
             return await GetModel(image);
         }
 
-        public IEnumerable<ImageResponseDigestModel> List(ImageResponseFilterModel filter)
+        public ImageResponseResultsModel List(ImageResponseFilterModel filter)
         {
             ulong guildId = filter.GuildId.GetValueOrDefault();
 
-            IQueryable<ImageResponse> images = _context.Get<ImageResponse>();
+            IEnumerable<ImageResponse> images = _context.Get<ImageResponse>();
 
             if (filter.GuildId.HasValue)
             {
@@ -116,14 +130,43 @@ namespace Substitute.Business.Services.Impl
                 images = images.Where(i => i.Command.Contains(filter.Command));
             }
 
-            return images.Skip(filter.PerPage * (filter.Page - 1))
+            Func<ImageResponse, object> sortFieldSelector = i => i.Id;
+            switch (filter.SortBy)
+            {
+                case EImageResponseSort.Id:
+                    sortFieldSelector = i => i.Id;
+                    break;
+                case EImageResponseSort.Command:
+                    sortFieldSelector = i => i.Command;
+                    break;
+            }
+
+            switch (filter.SortDirection)
+            {
+                case ESortDirection.Ascending:
+                    images = images.OrderBy(sortFieldSelector);
+                    break;
+                case ESortDirection.Descending:
+                    images = images.OrderByDescending(sortFieldSelector);
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+            
+            ImageResponseResultsModel result = new ImageResponseResultsModel(filter)
+            {
+                Total = images.Count(),
+                Items = images.Skip(filter.PerPage * (filter.Page - 1))
                          .Take(filter.PerPage)
                          .Select(i => new ImageResponseDigestModel
                          {
                              Command = i.Command,
                              Filename = i.Fielename,
                              Id = i.Id
-                         }).ToArray();
+                         }).ToArray()
+            };
+
+            return result;
         }
 
         public async Task<ImageResponseModel> Update(ImageResponseModel imageResponse)
@@ -133,7 +176,7 @@ namespace Substitute.Business.Services.Impl
             {
                 throw new CommandNotExistsException();
             }
-            
+
             string filename = $"{imageResponse.Command}{Path.GetExtension(imageResponse.Filename)}";
             byte[] data = imageResponse.Image;
             string guildIdString = model.GuildId.GetValueOrDefault().ToString();
@@ -165,6 +208,13 @@ namespace Substitute.Business.Services.Impl
         }
 
         #region Private helpers
+        private async Task<ImageResponseModel> GetModel(ImageResponse image, string returnUrl)
+        {
+            ImageResponseModel model = await GetModel(image);
+            model.ReturnUrl = returnUrl;
+            return model;
+        }
+
         private async Task<ImageResponseModel> GetModel(ImageResponse image)
         {
             return new ImageResponseModel

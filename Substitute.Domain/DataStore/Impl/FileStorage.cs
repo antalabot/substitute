@@ -39,17 +39,23 @@ namespace Substitute.Domain.DataStore.Impl
 
         public async Task Put(byte[] data, EStorage storage, string filename, params string[] path)
         {
-            await File.WriteAllBytesAsync(GetPath(storage, filename, path), data);
+            string location = GetPath(storage, filename, path);
+            CreateDirectoryIfNotExists(location);
+            await File.WriteAllBytesAsync(location, data);
         }
 
         public async Task Put(byte[] data, EStorage storage, string filename, string path)
         {
-            await File.WriteAllBytesAsync(GetPath(storage, filename, path), data);
+            string location = GetPath(storage, filename, path);
+            CreateDirectoryIfNotExists(location);
+            await File.WriteAllBytesAsync(location, data);
         }
 
         public async Task Put(byte[] data, EStorage storage, string filename)
         {
-            await File.WriteAllBytesAsync(GetPath(storage, filename), data);
+            string location = GetPath(storage, filename);
+            CreateDirectoryIfNotExists(location);
+            await File.WriteAllBytesAsync(location, data);
         }
 
         public void Delete(EStorage storage, string filename, params string[] path)
@@ -82,6 +88,15 @@ namespace Substitute.Domain.DataStore.Impl
         {
             string[] parts = new string[] { storage.ToString(), path, filename }.Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
             return Path.Combine(parts);
+        }
+
+        private void CreateDirectoryIfNotExists(string path)
+        {
+            string dir = Path.GetDirectoryName(path);
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
         }
         #endregion
     }
