@@ -49,11 +49,12 @@ namespace Substitute.Business.Services.Impl
 
                                                      IEnumerable<RoleModel> userGuildRoles = await _botService.GetGuildUserRoles(guildId, userId);
                                                      IEnumerable<GuildRole> guildRoles = (await _context.GetAsync<GuildRole>()).Where(r => r.GuildId == guildId);
-                                                     if (!userGuildRoles.Any() && !guildRoles.Any())
+                                                     IEnumerable<EAccessLevel> accessLevels = userGuildRoles.Join(guildRoles, ugr => ugr.Id, gr => gr.Id, (ugr, gr) => gr.AccessLevel);
+                                                     if (!accessLevels.Any())
                                                      {
                                                          return EAccessLevel.User;
                                                      }
-                                                     return userGuildRoles.Join(guildRoles, ugr => ugr.Id, gr => gr.Id, (ugr, gr) => ugr.AccessLevel).Min();
+                                                     return accessLevels.Min();
                                                  });
         }
 

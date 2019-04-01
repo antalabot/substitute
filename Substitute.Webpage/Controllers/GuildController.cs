@@ -34,13 +34,13 @@ namespace Substitute.Webpage.Controllers
         [HttpGet]
         public async Task<IActionResult> Select(ulong guildId)
         {
-            if (!(await _userService.GetGuilds(User.GetUserId(), await HttpContext.GetUserToken())).Any(g => g.Id == guildId && (g.CanManage || g.IsOwner)))
-            {
-                return Unauthorized();
-            }
-
             if (!await _botService.HasJoined(guildId))
             {
+                if (!(await _userService.GetGuilds(User.GetUserId(), await HttpContext.GetUserToken())).Any(g => g.Id == guildId && (g.CanManage || g.IsOwner)))
+                {
+                    return Unauthorized();
+                }
+
                 return Redirect(_botService.GetJoinLink(guildId, Request.GetEncodedUrl()));
             }
 

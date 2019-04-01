@@ -34,7 +34,7 @@ namespace Substitute.Business.Services.Impl
 
         public async Task<ImageResponseModel> Create(ImageResponseModel imageResponse)
         {
-            bool exists = _context.Get<ImageResponse>().Any(r => r.Command == imageResponse.Command);
+            bool exists = _context.Get<ImageResponse>().Any(r => r.Command == imageResponse.Command && r.GuildId == imageResponse.GuildId);
             if (exists)
             {
                 throw new CommandExistsException();

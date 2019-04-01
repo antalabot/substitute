@@ -15,7 +15,7 @@ namespace Substitute.Business.Services.Impl
     public class DiscordBotRestService : DiscordRestServiceBase, IDiscordBotRestService
     {
         #region Private constants
-        private const string DISCORD_TOKEN_KEY = "DiscordToken";
+        private const string DISCORD_TOKEN_KEY = "Discord:Token";
         private const string CLASS_NAME = "DiscordBotRestService";
         #endregion
         

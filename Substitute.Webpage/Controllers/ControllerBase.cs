@@ -167,7 +167,7 @@ namespace Substitute.Webpage.Controllers
                 return RedirectToGuildSelect();
             }
 
-            if (!await HasGuildAccessLevel(User.GetUserId(), UserGuildId.GetValueOrDefault(), EAccessLevel.Moderator))
+            if (!await HasGuildAccessLevel(User.GetUserId(), UserGuildId.GetValueOrDefault(), accessLevel))
             {
                 return Unauthorized();
             }
