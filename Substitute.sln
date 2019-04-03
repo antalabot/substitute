@@ -9,7 +9,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Substitute.Webpage", "Subst
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Substitute.Business", "Substitute.Business\Substitute.Business.csproj", "{599B4049-B231-460C-A196-257B5B6846D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Substitute.Bot", "Substitute.Bot\Substitute.Bot.csproj", "{8F2B02EF-713D-4B38-BEE8-5C44B1CDB917}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Substitute.Bot", "Substitute.Bot\Substitute.Bot.csproj", "{8F2B02EF-713D-4B38-BEE8-5C44B1CDB917}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4BB9C364-804F-4590-8C03-C5B8248B4333}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
