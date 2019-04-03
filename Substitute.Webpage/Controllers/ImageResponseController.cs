@@ -7,6 +7,7 @@ using Substitute.Business.Services;
 using Substitute.Domain.Enums;
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Substitute.Webpage.Controllers
@@ -36,7 +37,7 @@ namespace Substitute.Webpage.Controllers
         public async Task<IActionResult> Details(ulong id, string returnUrl) => await CheckPrivilages(EAccessLevel.User) ?? View(await _imageResponseService.Details(id, returnUrl));
 
         [HttpGet]
-        public async Task<IActionResult> Image(ulong id) => await CheckPrivilages(EAccessLevel.User) ?? await GetResponseImage(id);
+        public async Task<IActionResult> Image(ulong id, [Optional] string filename) => await CheckPrivilages(EAccessLevel.User) ?? await GetResponseImage(id);
         #endregion
 
         #region POST methods

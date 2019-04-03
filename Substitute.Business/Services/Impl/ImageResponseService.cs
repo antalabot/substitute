@@ -177,7 +177,7 @@ namespace Substitute.Business.Services.Impl
                 throw new CommandNotExistsException();
             }
 
-            string filename = $"{imageResponse.Command}{Path.GetExtension(imageResponse.Filename)}";
+            string filename = $"{imageResponse.Command}{Path.GetExtension(imageResponse.Filename ?? model.Fielename)}";
             byte[] data = imageResponse.Image;
             string guildIdString = model.GuildId.GetValueOrDefault().ToString();
 

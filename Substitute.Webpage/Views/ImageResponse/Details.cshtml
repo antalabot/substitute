@@ -10,8 +10,8 @@
 
 <div class="row">
     <div class="col-md-6">
-        <a href="@Url.Action("Image", "ImageResponse", new { Id = Model.Id })" class="thumbnail">
-            <img src="@Url.Action("Image", "ImageResponse", new { Id = Model.Id })" alt="@Model.Filename" />
+        <a href="@Url.Action("Image", "ImageResponse", new { Id = Model.Id, filename = Model.Filename })" class="thumbnail">
+            <img src="@Url.Action("Image", "ImageResponse", new { Id = Model.Id, filename = Model.Filename })" alt="@Model.Filename" />
         </a>
     </div>
     @if (canEdit)
