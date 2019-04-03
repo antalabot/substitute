@@ -58,4 +58,4 @@ After configuring and building *Substitute*:
 
 ## License
 
-Project available under [Apache License 2.0](LICENSE.md).
+Project available under [Apache License 2.0](LICENSE).
